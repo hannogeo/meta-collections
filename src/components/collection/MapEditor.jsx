@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { MapContainer, TileLayer, Marker, Polygon, useMapEvents } from 'react-leaflet'
 import FitBounds from './FitBounds'
 
@@ -19,51 +19,50 @@ export default function MapEditor({ value, onChange }) {
   const [mode, setMode] = useState('marker')
   const [polygonPoints, setPolygonPoints] = useState(value?.polygon || [])
   const [markers, setMarkers] = useState(value?.markers || [])
-  const [zoom, setZoom] = useState(value?.zoom || 6)
+  const prevValueRef = useRef(value)
+
+  useEffect(() => {
+    if (value !== prevValueRef.current) {
+      prevValueRef.current = value
+      setMarkers(value?.markers || [])
+      setPolygonPoints(value?.polygon || [])
+    }
+  }, [value])
 
   function handleAddMarker(latlng) {
-    const label = prompt('Label for this marker (optional):') || ''
-    const updated = [...markers, { lat: latlng.lat, lng: latlng.lng, label }]
+    const updated = [...markers, { lat: latlng.lat, lng: latlng.lng }]
     setMarkers(updated)
-    emitChange(updated, polygonPoints, zoom)
+    emitChange(updated, polygonPoints)
   }
 
   function handleAddPolygonPoint(latlng) {
     const updated = [...polygonPoints, [latlng.lat, latlng.lng]]
     setPolygonPoints(updated)
-    emitChange(markers, updated, zoom)
+    emitChange(markers, updated)
   }
 
-  function emitChange(m, p, z) {
+  function emitChange(m, p) {
     onChange({
-      center: [0, 0],
-      zoom: z,
       markers: m,
       polygon: p.length > 0 ? p : null,
     })
   }
 
-  function handleZoomChange(e) {
-    const z = Number(e.target.value)
-    setZoom(z)
-    emitChange(markers, polygonPoints, z)
-  }
-
   function removeMarker(index) {
     const updated = markers.filter((_, i) => i !== index)
     setMarkers(updated)
-    emitChange(updated, polygonPoints, zoom)
+    emitChange(updated, polygonPoints)
   }
 
   function removePolygonPoint(index) {
     const updated = polygonPoints.filter((_, i) => i !== index)
     setPolygonPoints(updated)
-    emitChange(markers, updated, zoom)
+    emitChange(markers, updated)
   }
 
   function clearPolygon() {
     setPolygonPoints([])
-    emitChange(markers, [], zoom)
+    emitChange(markers, [])
   }
 
   return (
@@ -105,7 +104,7 @@ export default function MapEditor({ value, onChange }) {
       <div className="h-[280px] rounded-md overflow-hidden border border-[var(--color-border)]">
         <MapContainer
           center={[0, 0]}
-          zoom={zoom}
+          zoom={2}
           style={{ height: '100%', width: '100%' }}
           className="z-0"
         >
@@ -113,7 +112,7 @@ export default function MapEditor({ value, onChange }) {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <FitBounds markers={markers} polygon={polygonPoints.length > 0 ? polygonPoints : null} zoom={zoom} />
+          <FitBounds markers={markers} polygon={polygonPoints.length > 0 ? polygonPoints : null} />
           <ClickHandler onAddMarker={handleAddMarker} onAddPolygonPoint={handleAddPolygonPoint} mode={mode} />
           {markers.map((m, i) => (
             <Marker key={i} position={[m.lat, m.lng]} />
@@ -122,19 +121,6 @@ export default function MapEditor({ value, onChange }) {
             <Polygon positions={polygonPoints} />
           )}
         </MapContainer>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <label className="text-[11px] text-[var(--color-ink-faint)] shrink-0">Zoom</label>
-        <input
-          type="range"
-          min={2}
-          max={18}
-          value={zoom}
-          onChange={handleZoomChange}
-          className="flex-1 h-1 accent-[var(--color-ink)] cursor-pointer"
-        />
-        <span className="text-[11px] text-[var(--color-ink-faint)] tabular-nums w-5 text-right">{zoom}</span>
       </div>
 
       <p className="text-[11px] text-[var(--color-ink-faint)]">
@@ -146,7 +132,7 @@ export default function MapEditor({ value, onChange }) {
           {markers.map((m, i) => (
             <div key={i} className="flex items-center justify-between text-xs py-1">
               <span className="text-[var(--color-ink-muted)] truncate">
-                {m.label || `${m.lat.toFixed(4)}, ${m.lng.toFixed(4)}`}
+                {m.lat.toFixed(4)}, {m.lng.toFixed(4)}
               </span>
               <button
                 type="button"

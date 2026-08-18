@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useMap } from 'react-leaflet'
 import L from 'leaflet'
 
-export default function FitBounds({ markers, polygon, zoom }) {
+export default function FitBounds({ markers, polygon }) {
   const map = useMap()
 
   useEffect(() => {
@@ -23,13 +23,13 @@ export default function FitBounds({ markers, polygon, zoom }) {
     if (points.length === 0) return
 
     if (points.length === 1) {
-      map.setView(points[0], zoom || 6)
+      map.setView(points[0], 5)
       return
     }
 
     const bounds = L.latLngBounds(points)
-    map.fitBounds(bounds, { padding: [30, 30], maxZoom: zoom || 12 })
-  }, [markers, polygon, zoom, map])
+    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 8 })
+  }, [markers, polygon, map])
 
   return null
 }

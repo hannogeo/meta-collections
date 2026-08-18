@@ -39,16 +39,16 @@ export default function MetaCard({ meta, index, onEdit, onDelete }) {
                   center={[0, 0]}
                   zoom={2}
                   style={{ height: '100%', width: '100%' }}
-                  scrollWheelZoom={false}
-                  dragging={false}
+                  scrollWheelZoom={true}
+                  dragging={true}
                   doubleClickZoom={false}
-                  touchZoom={false}
+                  touchZoom={true}
                 >
                   <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
-                  <FitBounds markers={meta.mapData.markers} polygon={meta.mapData.polygon} zoom={meta.mapData.zoom} />
+                  <FitBounds markers={meta.mapData.markers} polygon={meta.mapData.polygon} />
                   {meta.mapData.markers?.map((m, i) => (
                     <Marker key={i} position={[m.lat, m.lng]} />
                   ))}

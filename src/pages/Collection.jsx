@@ -135,6 +135,7 @@ export default function Collection() {
         submitLabel="Save"
         initialText={editingMeta?.text}
         initialMapData={editingMeta?.mapData}
+        formKey={editingMeta?.id}
       />
     </div>
   )
