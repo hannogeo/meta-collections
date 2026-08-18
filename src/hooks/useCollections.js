@@ -20,11 +20,13 @@ const MAX_METAS = 1000
 
 export function useCollections(userId) {
   const [collections, setCollections] = useState([])
+  const [trashCollections, setTrashCollections] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!userId) {
       setCollections([])
+      setTrashCollections([])
       setLoading(false)
       return
     }
@@ -35,11 +37,12 @@ export function useCollections(userId) {
     )
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map((doc) => ({
+      const all = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }))
-      setCollections(data)
+      setCollections(all.filter((c) => !c.deletedAt))
+      setTrashCollections(all.filter((c) => c.deletedAt))
       setLoading(false)
     })
 
@@ -47,7 +50,8 @@ export function useCollections(userId) {
   }, [userId])
 
   async function createCollection(name) {
-    if (collections.length >= MAX_COLLECTIONS) {
+    const activeCount = collections.length
+    if (activeCount >= MAX_COLLECTIONS) {
       throw new Error(`Maximum of ${MAX_COLLECTIONS} collections reached`)
     }
 
@@ -55,12 +59,31 @@ export function useCollections(userId) {
       name,
       createdAt: serverTimestamp(),
       metaCount: 0,
+      deletedAt: null,
     })
 
     return docRef.id
   }
 
-  async function deleteCollection(collectionId) {
+  async function renameCollection(collectionId, newName) {
+    await updateDoc(doc(db, 'users', userId, 'collections', collectionId), {
+      name: newName,
+    })
+  }
+
+  async function softDeleteCollection(collectionId) {
+    await updateDoc(doc(db, 'users', userId, 'collections', collectionId), {
+      deletedAt: serverTimestamp(),
+    })
+  }
+
+  async function restoreCollection(collectionId) {
+    await updateDoc(doc(db, 'users', userId, 'collections', collectionId), {
+      deletedAt: null,
+    })
+  }
+
+  async function permanentDeleteCollection(collectionId) {
     const metasSnap = await getDocs(collection(db, 'users', userId, 'collections', collectionId, 'metas'))
 
     for (const metaDoc of metasSnap.docs) {
@@ -68,6 +91,12 @@ export function useCollections(userId) {
     }
 
     await deleteDoc(doc(db, 'users', userId, 'collections', collectionId))
+  }
+
+  async function emptyTrash() {
+    for (const col of trashCollections) {
+      await permanentDeleteCollection(col.id)
+    }
   }
 
   async function getMetas(collectionId) {
@@ -121,9 +150,14 @@ export function useCollections(userId) {
 
   return {
     collections,
+    trashCollections,
     loading,
     createCollection,
-    deleteCollection,
+    renameCollection,
+    softDeleteCollection,
+    restoreCollection,
+    permanentDeleteCollection,
+    emptyTrash,
     getMetas,
     addMeta,
     updateMeta,

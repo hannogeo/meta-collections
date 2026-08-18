@@ -73,7 +73,7 @@ export default function Collection() {
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 bg-[var(--color-surface)]/80 backdrop-blur-md border-b border-[var(--color-border)]">
-        <div className="max-w-2xl mx-auto px-6 h-14 flex items-center gap-4">
+        <div className="max-w-3xl mx-auto px-6 h-14 flex items-center gap-4">
           <button
             onClick={() => navigate('/dashboard')}
             className="text-xs text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors cursor-pointer"
@@ -89,7 +89,7 @@ export default function Collection() {
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-6 py-10">
+      <main className="max-w-3xl mx-auto px-6 py-10">
         <div className="flex justify-center mb-10">
           <Button onClick={() => setShowAdd(true)}>
             Add meta
@@ -97,13 +97,15 @@ export default function Collection() {
         </div>
 
         {metas.length === 0 ? (
-          <div className="py-24 text-center">
-            <p className="text-sm text-[var(--color-ink-muted)]">
-              Empty. Add your first meta above.
-            </p>
+          <div className="py-20">
+            <div className="max-w-sm mx-auto text-center">
+              <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed">
+                No metas yet. Add your first tip, trick, or location marker above.
+              </p>
+            </div>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {metas.map((meta, i) => (
               <MetaCard
                 key={meta.id}

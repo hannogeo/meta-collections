@@ -21,9 +21,9 @@ export default function MetaCard({ meta, index, onEdit, onDelete }) {
 
   return (
     <>
-      <div className="group relative">
+      <div className="group relative bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg p-5">
         <div className="flex items-start gap-4">
-          <span className="text-xs text-[var(--color-ink-faint)] tabular-nums pt-1 shrink-0 w-6 text-right">
+          <span className="text-xs text-[var(--color-ink-faint)] tabular-nums pt-0.5 shrink-0 w-6 text-right">
             {index}
           </span>
           <div className="flex-1 min-w-0 space-y-3">
@@ -63,9 +63,9 @@ export default function MetaCard({ meta, index, onEdit, onDelete }) {
           <div className="relative shrink-0" ref={menuRef}>
             <button
               onClick={() => setMenuOpen((o) => !o)}
-              className="opacity-0 group-hover:opacity-100 w-7 h-7 flex items-center justify-center rounded-md text-[var(--color-ink-faint)] hover:text-[var(--color-ink)] hover:bg-[var(--color-border)]/40 transition-all cursor-pointer text-sm"
+              className="opacity-0 group-hover:opacity-100 w-6 h-6 flex items-center justify-center rounded text-[var(--color-ink-faint)] hover:text-[var(--color-ink)] hover:bg-[var(--color-border)]/40 transition-all cursor-pointer"
             >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
                 <circle cx="8" cy="3" r="1.5"/>
                 <circle cx="8" cy="8" r="1.5"/>
                 <circle cx="8" cy="13" r="1.5"/>
