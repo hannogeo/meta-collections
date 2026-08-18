@@ -1,10 +1,23 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { MapContainer, TileLayer, Marker, Polygon } from 'react-leaflet'
 import FitBounds from './FitBounds'
 import ConfirmDialog from '../ui/ConfirmDialog'
 
 export default function MetaCard({ meta, index, onEdit, onDelete }) {
   const [showConfirm, setShowConfirm] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef(null)
+
+  useEffect(() => {
+    if (!menuOpen) return
+    function handleClick(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [menuOpen])
 
   return (
     <>
@@ -47,19 +60,34 @@ export default function MetaCard({ meta, index, onEdit, onDelete }) {
             )}
           </div>
 
-          <div className="opacity-0 group-hover:opacity-100 flex flex-col gap-1 transition-all shrink-0">
+          <div className="relative shrink-0" ref={menuRef}>
             <button
-              onClick={() => onEdit(meta)}
-              className="text-[var(--color-ink-faint)] hover:text-[var(--color-ink)] text-xs cursor-pointer transition-colors"
+              onClick={() => setMenuOpen((o) => !o)}
+              className="opacity-0 group-hover:opacity-100 w-7 h-7 flex items-center justify-center rounded-md text-[var(--color-ink-faint)] hover:text-[var(--color-ink)] hover:bg-[var(--color-border)]/40 transition-all cursor-pointer text-sm"
             >
-              Edit
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <circle cx="8" cy="3" r="1.5"/>
+                <circle cx="8" cy="8" r="1.5"/>
+                <circle cx="8" cy="13" r="1.5"/>
+              </svg>
             </button>
-            <button
-              onClick={() => setShowConfirm(true)}
-              className="text-[var(--color-ink-faint)] hover:text-[var(--color-danger)] text-xs cursor-pointer transition-colors"
-            >
-              &times;
-            </button>
+
+            {menuOpen && (
+              <div className="absolute right-0 top-full mt-1 bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-md shadow-sm py-1 min-w-[120px] z-20">
+                <button
+                  onClick={() => { setMenuOpen(false); onEdit(meta) }}
+                  className="w-full text-left px-3 py-2 text-sm text-[var(--color-ink)] hover:bg-[var(--color-border)]/30 transition-colors cursor-pointer"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => { setMenuOpen(false); setShowConfirm(true) }}
+                  className="w-full text-left px-3 py-2 text-sm text-[var(--color-danger)] hover:bg-[var(--color-danger)]/5 transition-colors cursor-pointer"
+                >
+                  Delete
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
