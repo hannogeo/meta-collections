@@ -17,6 +17,7 @@ export default function Dashboard() {
   const [renameValue, setRenameValue] = useState('')
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [showLogout, setShowLogout] = useState(false)
+  const [emailVisible, setEmailVisible] = useState(false)
 
   if (authLoading) return <LoadingSpinner />
   if (!user) return <Navigate to="/login" />
@@ -50,10 +51,13 @@ export default function Dashboard() {
             Meta Collections
           </Link>
           <div className="flex items-center gap-5">
-            <Link to="/trash" className="text-xs text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] transition-colors hidden sm:inline">
-              Trash
-            </Link>
-            <span className="text-xs text-[var(--color-ink-faint)] hidden sm:inline">{user.email}</span>
+            <button
+              onClick={() => setEmailVisible((v) => !v)}
+              className="text-xs text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] transition-colors cursor-pointer hidden sm:inline"
+              title={emailVisible ? 'Hide email' : 'Show email'}
+            >
+              {emailVisible ? user.email : '••••'}
+            </button>
             <button onClick={() => setShowLogout(true)} className="text-xs text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors cursor-pointer">
               Log out
             </button>
@@ -67,8 +71,17 @@ export default function Dashboard() {
             {collections.length === 0 ? 'Welcome' : 'Your collections'}
           </h2>
           {collections.length > 0 && (
-            <p className="text-sm text-[var(--color-ink-faint)] mt-1">
-              {collections.length} {collections.length === 1 ? 'collection' : 'collections'} &middot; {totalMetas} {totalMetas === 1 ? 'meta' : 'metas'} total
+            <p className="text-sm text-[var(--color-ink-faint)] mt-1 flex items-center gap-2">
+              <span>{collections.length} {collections.length === 1 ? 'collection' : 'collections'} &middot; {totalMetas} {totalMetas === 1 ? 'meta' : 'metas'} total</span>
+              <Link to="/trash" className="inline-flex items-center justify-center w-5 h-5 rounded hover:bg-[var(--color-border)]/40 transition-colors" title="Trash">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 6h18"/>
+                  <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                  <line x1="10" y1="11" x2="10" y2="17"/>
+                  <line x1="14" y1="11" x2="14" y2="17"/>
+                </svg>
+              </Link>
             </p>
           )}
         </div>
@@ -109,6 +122,7 @@ export default function Dashboard() {
             )}
           </div>
         )}
+
       </main>
 
       <CreateCollectionModal

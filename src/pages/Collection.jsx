@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useCollections } from '../hooks/useCollections'
 import { useParams, useNavigate, Navigate } from 'react-router-dom'
@@ -17,6 +17,7 @@ export default function Collection() {
   const [editingMeta, setEditingMeta] = useState(null)
   const [notFound, setNotFound] = useState(false)
   const navigate = useNavigate()
+  const bottomRef = useRef(null)
 
   const collection = collections.find((c) => c.id === id)
 
@@ -55,6 +56,8 @@ export default function Collection() {
     await addMeta(id, data)
     const updated = await getMetas(id)
     setMetas(updated)
+    setShowAdd(false)
+    setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 100)
   }
 
   async function handleEdit(data) {
@@ -115,6 +118,7 @@ export default function Collection() {
                 onDelete={handleDelete}
               />
             ))}
+            <div ref={bottomRef} />
           </div>
         )}
       </main>
