@@ -49,7 +49,7 @@ export function useCollections(userId) {
     return unsubscribe
   }, [userId])
 
-  async function createCollection(name) {
+  async function createCollection(name, emoji) {
     const activeCount = collections.length
     if (activeCount >= MAX_COLLECTIONS) {
       throw new Error(`Maximum of ${MAX_COLLECTIONS} collections reached`)
@@ -57,6 +57,7 @@ export function useCollections(userId) {
 
     const docRef = await addDoc(collection(db, 'users', userId, 'collections'), {
       name,
+      emoji: emoji || null,
       createdAt: serverTimestamp(),
       metaCount: 0,
       deletedAt: null,
@@ -65,9 +66,15 @@ export function useCollections(userId) {
     return docRef.id
   }
 
-  async function renameCollection(collectionId, newName) {
+  async function renameCollection(collectionId, newName, emoji) {
+    const updates = { name: newName }
+    if (emoji !== undefined) updates.emoji = emoji || null
+    await updateDoc(doc(db, 'users', userId, 'collections', collectionId), updates)
+  }
+
+  async function updateEmoji(collectionId, emoji) {
     await updateDoc(doc(db, 'users', userId, 'collections', collectionId), {
-      name: newName,
+      emoji: emoji || null,
     })
   }
 
@@ -154,6 +161,7 @@ export function useCollections(userId) {
     loading,
     createCollection,
     renameCollection,
+    updateEmoji,
     softDeleteCollection,
     restoreCollection,
     permanentDeleteCollection,

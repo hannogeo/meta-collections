@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { Navigate } from 'react-router-dom'
 import SignupForm from '../components/auth/SignupForm'
@@ -5,6 +6,8 @@ import LoadingSpinner from '../components/ui/LoadingSpinner'
 
 export default function Signup() {
   const { user, loading } = useAuth()
+
+  useEffect(() => { document.title = 'Sign up | Meta Collections' }, [])
 
   if (loading) return <LoadingSpinner />
   if (user) return <Navigate to="/dashboard" />

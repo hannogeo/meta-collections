@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useCollections } from '../hooks/useCollections'
 import { Navigate, Link } from 'react-router-dom'
@@ -20,6 +20,8 @@ export default function Trash() {
   const { trashCollections, restoreCollection, permanentDeleteCollection, emptyTrash } = useCollections(user?.uid)
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [showEmptyTrash, setShowEmptyTrash] = useState(false)
+
+  useEffect(() => { document.title = 'Trash | Meta Collections' }, [])
 
   if (authLoading) return <LoadingSpinner />
   if (!user) return <Navigate to="/login" />
@@ -66,6 +68,7 @@ export default function Trash() {
                 <div key={col.id} className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg p-4 flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <h3 className="text-sm font-medium text-[var(--color-ink-muted)] truncate line-through">
+                      {col.emoji && <span className="mr-1.5">{col.emoji}</span>}
                       {col.name}
                     </h3>
                     <p className="text-xs text-[var(--color-ink-faint)] mt-1 tabular-nums">

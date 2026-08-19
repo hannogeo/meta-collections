@@ -1,7 +1,10 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Button from '../components/ui/Button'
 
 export default function NotFound() {
+  useEffect(() => { document.title = 'Page not found | Meta Collections' }, [])
+
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="text-center">

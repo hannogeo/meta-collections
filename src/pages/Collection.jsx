@@ -4,13 +4,14 @@ import { useCollections } from '../hooks/useCollections'
 import { useParams, useNavigate, Navigate } from 'react-router-dom'
 import MetaCard from '../components/collection/MetaCard'
 import MetaFormModal from '../components/collection/MetaFormModal'
+import EmojiPicker from '../components/dashboard/EmojiPicker'
 import Button from '../components/ui/Button'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 
 export default function Collection() {
   const { id } = useParams()
   const { user, loading: authLoading } = useAuth()
-  const { getMetas, addMeta, updateMeta, deleteMeta, collections, MAX_METAS } = useCollections(user?.uid)
+  const { getMetas, addMeta, updateMeta, deleteMeta, updateEmoji, collections, MAX_METAS } = useCollections(user?.uid)
   const [metas, setMetas] = useState([])
   const [loading, setLoading] = useState(true)
   const [showAdd, setShowAdd] = useState(false)
@@ -20,6 +21,13 @@ export default function Collection() {
   const bottomRef = useRef(null)
 
   const collection = collections.find((c) => c.id === id)
+
+  useEffect(() => {
+    if (collection?.name) {
+      document.title = `${collection.name} | Meta Collections`
+    }
+    return () => { document.title = 'Meta Collections' }
+  }, [collection?.name])
 
   useEffect(() => {
     if (!user || !id) return
@@ -76,13 +84,34 @@ export default function Collection() {
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 bg-[var(--color-surface)]/80 backdrop-blur-md border-b border-[var(--color-border)]">
-        <div className="max-w-3xl mx-auto px-6 h-14 flex items-center gap-4">
+        <div className="max-w-3xl mx-auto px-6 h-14 flex items-center gap-4 group">
           <button
             onClick={() => navigate('/dashboard')}
             className="text-xs text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors cursor-pointer"
           >
             &larr; All
           </button>
+          <EmojiPicker
+            value={collection?.emoji || ''}
+            onChange={(emoji) => updateEmoji(id, emoji)}
+          >
+            <div className="group/emoji relative w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[var(--color-border)]/50 transition-colors text-lg shrink-0 cursor-pointer" title="Change icon">
+              {collection?.emoji || (
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-[var(--color-ink-faint)]">
+                  <circle cx="10" cy="10" r="8" strokeDasharray="3 3"/>
+                </svg>
+              )}
+              {collection?.emoji && (
+                <span
+                  onClick={(e) => { e.stopPropagation(); updateEmoji(id, '') }}
+                  className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-[var(--color-surface-raised)] border border-[var(--color-border)] text-[var(--color-ink-muted)] hover:text-[var(--color-danger)] hover:border-[var(--color-danger)]/30 flex items-center justify-center cursor-pointer text-[10px] leading-none transition-all opacity-0 group-hover/emoji:opacity-100 pointer-events-none group-hover/emoji:pointer-events-auto"
+                  title="Remove icon"
+                >
+                  &times;
+                </span>
+              )}
+            </div>
+          </EmojiPicker>
           <h1 className="text-sm font-semibold tracking-tight text-[var(--color-ink)] truncate flex-1">
             {collection?.name || 'Collection'}
           </h1>

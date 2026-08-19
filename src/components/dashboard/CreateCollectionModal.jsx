@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import Modal from '../ui/Modal'
 import Button from '../ui/Button'
+import EmojiPicker from './EmojiPicker'
 
 export default function CreateCollectionModal({ open, onClose, onCreate, maxReached }) {
   const [name, setName] = useState('')
+  const [emoji, setEmoji] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -13,8 +15,9 @@ export default function CreateCollectionModal({ open, onClose, onCreate, maxReac
     setLoading(true)
     setError('')
     try {
-      await onCreate(name.trim())
+      await onCreate(name.trim(), emoji)
       setName('')
+      setEmoji('')
       onClose()
     } catch (err) {
       setError(err.message)
@@ -24,6 +27,7 @@ export default function CreateCollectionModal({ open, onClose, onCreate, maxReac
 
   function handleClose() {
     setName('')
+    setEmoji('')
     setError('')
     onClose()
   }
@@ -44,16 +48,29 @@ export default function CreateCollectionModal({ open, onClose, onCreate, maxReac
               {error}
             </div>
           )}
-          <div>
-            <label className="block text-xs font-medium text-[var(--color-ink-muted)] mb-1.5 uppercase tracking-wider">Name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Scandinavian metas"
-              autoFocus
-              className="w-full px-3 py-2 text-sm bg-transparent border border-[var(--color-border)] rounded-md text-[var(--color-ink)] placeholder:text-[var(--color-ink-faint)] focus:outline-none focus:border-[var(--color-ink)] transition-colors"
-            />
+          <div className="flex items-end gap-3">
+            <EmojiPicker value={emoji} onChange={setEmoji}>
+              <div className="w-12 h-12 flex items-center justify-center rounded-lg border border-dashed border-[var(--color-border)] hover:border-[var(--color-border-hover)] transition-colors cursor-pointer shrink-0">
+                {emoji ? (
+                  <span className="text-2xl">{emoji}</span>
+                ) : (
+                  <svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-[var(--color-ink-faint)]">
+                    <circle cx="10" cy="10" r="8" strokeDasharray="3 3"/>
+                  </svg>
+                )}
+              </div>
+            </EmojiPicker>
+            <div className="flex-1">
+              <label className="block text-xs font-medium text-[var(--color-ink-muted)] mb-1.5 uppercase tracking-wider">Name</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. Scandinavian metas"
+                autoFocus
+                className="w-full px-3 py-2 text-sm bg-transparent border border-[var(--color-border)] rounded-md text-[var(--color-ink)] placeholder:text-[var(--color-ink-faint)] focus:outline-none focus:border-[var(--color-ink)] transition-colors"
+              />
+            </div>
           </div>
           <Button type="submit" disabled={loading || !name.trim()} className="w-full">
             {loading ? 'Creating...' : 'Create'}

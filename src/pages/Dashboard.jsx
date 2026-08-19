@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useCollections } from '../hooks/useCollections'
 import { Navigate, Link } from 'react-router-dom'
 import CollectionCard from '../components/dashboard/CollectionCard'
 import CreateCollectionModal from '../components/dashboard/CreateCollectionModal'
+import EmojiPicker from '../components/dashboard/EmojiPicker'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
 import Modal from '../components/ui/Modal'
 import Button from '../components/ui/Button'
@@ -11,13 +12,16 @@ import LoadingSpinner from '../components/ui/LoadingSpinner'
 
 export default function Dashboard() {
   const { user, loading: authLoading, logout } = useAuth()
-  const { collections, loading, createCollection, renameCollection, softDeleteCollection, MAX_COLLECTIONS } = useCollections(user?.uid)
+  const { collections, loading, createCollection, renameCollection, updateEmoji, softDeleteCollection, MAX_COLLECTIONS } = useCollections(user?.uid)
   const [showCreate, setShowCreate] = useState(false)
   const [renameTarget, setRenameTarget] = useState(null)
   const [renameValue, setRenameValue] = useState('')
+  const [renameEmoji, setRenameEmoji] = useState('')
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [showLogout, setShowLogout] = useState(false)
   const [emailVisible, setEmailVisible] = useState(false)
+
+  useEffect(() => { document.title = 'Dashboard | Meta Collections' }, [])
 
   if (authLoading) return <LoadingSpinner />
   if (!user) return <Navigate to="/login" />
@@ -25,14 +29,16 @@ export default function Dashboard() {
   function handleRename(col) {
     setRenameTarget(col)
     setRenameValue(col.name)
+    setRenameEmoji(col.emoji || '')
   }
 
   async function handleRenameSubmit(e) {
     e.preventDefault()
     if (!renameValue.trim() || !renameTarget) return
-    await renameCollection(renameTarget.id, renameValue.trim())
+    await renameCollection(renameTarget.id, renameValue.trim(), renameEmoji)
     setRenameTarget(null)
     setRenameValue('')
+    setRenameEmoji('')
   }
 
   async function handleSoftDelete() {
@@ -42,6 +48,11 @@ export default function Dashboard() {
   }
 
   const totalMetas = collections.reduce((sum, c) => sum + (c.metaCount || 0), 0)
+
+  const renameDisabled = !renameValue.trim() || (
+    renameValue.trim() === renameTarget?.name &&
+    renameEmoji === (renameTarget?.emoji || '')
+  )
 
   return (
     <div className="min-h-screen">
@@ -106,6 +117,7 @@ export default function Dashboard() {
                 collection={col}
                 onRename={handleRename}
                 onDelete={(col) => setDeleteTarget(col)}
+                onUpdateEmoji={updateEmoji}
               />
             ))}
             {collections.length < MAX_COLLECTIONS && (
@@ -132,8 +144,9 @@ export default function Dashboard() {
         maxReached={collections.length >= MAX_COLLECTIONS}
       />
 
-      <Modal open={!!renameTarget} onClose={() => setRenameTarget(null)} title="Rename collection">
+      <Modal open={!!renameTarget} onClose={() => setRenameTarget(null)} title="Edit collection">
         <form onSubmit={handleRenameSubmit} className="space-y-4">
+          <EmojiPicker value={renameEmoji} onChange={setRenameEmoji} />
           <input
             type="text"
             value={renameValue}
@@ -141,8 +154,8 @@ export default function Dashboard() {
             autoFocus
             className="w-full px-3 py-2 text-sm bg-transparent border border-[var(--color-border)] rounded-md text-[var(--color-ink)] placeholder:text-[var(--color-ink-faint)] focus:outline-none focus:border-[var(--color-ink)] transition-colors"
           />
-          <Button type="submit" disabled={!renameValue.trim() || renameValue.trim() === renameTarget?.name} className="w-full">
-            Rename
+          <Button type="submit" disabled={renameDisabled} className="w-full">
+            Save
           </Button>
         </form>
       </Modal>
