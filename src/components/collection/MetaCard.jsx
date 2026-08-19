@@ -205,6 +205,28 @@ export default function MetaCard({ meta, index, onEdit, onDelete }) {
                 )}
               </div>
             )}
+
+            {meta.examples && meta.examples.length > 0 && (
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+                {meta.examples.map((ex, i) => (
+                  <a
+                    key={i}
+                    href={ex.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-xs text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="shrink-0 opacity-50">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                      <polyline points="15 3 21 3 21 9"/>
+                      <line x1="10" y1="14" x2="21" y2="3"/>
+                    </svg>
+                    <span className="truncate">{ex.title}</span>
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="relative shrink-0" ref={menuRef}>

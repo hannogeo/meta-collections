@@ -19,7 +19,6 @@ export default function Dashboard() {
   const [renameEmoji, setRenameEmoji] = useState('')
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [showLogout, setShowLogout] = useState(false)
-  const [emailVisible, setEmailVisible] = useState(false)
 
   useEffect(() => { document.title = 'Dashboard | Meta Collections' }, [])
 
@@ -62,13 +61,6 @@ export default function Dashboard() {
             Meta Collections
           </Link>
           <div className="flex items-center gap-5">
-            <button
-              onClick={() => setEmailVisible((v) => !v)}
-              className="text-xs text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] transition-colors cursor-pointer hidden sm:inline"
-              title={emailVisible ? 'Hide email' : 'Show email'}
-            >
-              {emailVisible ? user.email : '••••'}
-            </button>
             <button onClick={() => setShowLogout(true)} className="text-xs text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors cursor-pointer">
               Log out
             </button>

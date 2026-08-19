@@ -116,7 +116,7 @@ export function useCollections(userId) {
     return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
   }
 
-  async function addMeta(collectionId, { text, mapData }) {
+  async function addMeta(collectionId, { text, mapData, examples }) {
     const colDoc = await getDoc(doc(db, 'users', userId, 'collections', collectionId))
     const colData = colDoc.data()
 
@@ -129,6 +129,7 @@ export function useCollections(userId) {
       {
         text,
         mapData: mapData || null,
+        examples: examples || null,
         createdAt: serverTimestamp(),
         order: colData.metaCount,
       }
@@ -141,10 +142,11 @@ export function useCollections(userId) {
     return metaRef.id
   }
 
-  async function updateMeta(collectionId, metaId, { text, mapData }) {
+  async function updateMeta(collectionId, metaId, { text, mapData, examples }) {
     await updateDoc(doc(db, 'users', userId, 'collections', collectionId, 'metas', metaId), {
       text,
       mapData: mapData || null,
+      examples: examples || null,
     })
   }
 
