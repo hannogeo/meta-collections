@@ -18,8 +18,22 @@
   --color-danger-hover: #b91c1c;
 }
 
+[data-theme="dark"] {
+  --color-surface: #09090b;
+  --color-surface-raised: #18181b;
+  --color-ink: #fafaf9;
+  --color-ink-muted: #a1a1aa;
+  --color-ink-faint: #52525b;
+  --color-border: #27272a;
+  --color-border-hover: #3f3f46;
+  --color-accent: #fafaf9;
+  --color-accent-hover: #e4e4e7;
+  --color-danger: #ef4444;
+  --color-danger-hover: #dc2626;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --color-surface: #09090b;
     --color-surface-raised: #18181b;
     --color-ink: #fafaf9;
