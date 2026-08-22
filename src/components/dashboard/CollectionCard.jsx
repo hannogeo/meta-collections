@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import EmojiPicker from './EmojiPicker'
 
-export default function CollectionCard({ collection, username, onRename, onDelete, onUpdateEmoji }) {
+export default function CollectionCard({ collection, username, onEdit, onDelete, onUpdateEmoji }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef(null)
 
@@ -52,8 +52,27 @@ export default function CollectionCard({ collection, username, onRename, onDelet
         <h3 className="text-sm font-medium text-[var(--color-ink)] truncate">
           {collection.name}
         </h3>
-        <p className="text-xs text-[var(--color-ink-faint)] mt-0.5 tabular-nums">
-          {collection.metaCount || 0} {collection.metaCount === 1 ? 'meta' : 'metas'}
+        <p className="text-xs text-[var(--color-ink-faint)] mt-0.5 tabular-nums flex items-center gap-1.5">
+          <span>{collection.metaCount || 0} {collection.metaCount === 1 ? 'meta' : 'metas'}</span>
+          {collection.visibility === 'public' && (
+            <span className="inline-flex items-center gap-0.5 text-[var(--color-ink-faint)]">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
+              Public
+            </span>
+          )}
+          {collection.visibility !== 'public' && (
+            <span className="inline-flex items-center gap-0.5 text-[var(--color-ink-faint)]">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              Private
+            </span>
+          )}
         </p>
       </div>
       <div className="relative shrink-0 z-10" ref={menuRef}>
@@ -78,11 +97,11 @@ export default function CollectionCard({ collection, username, onRename, onDelet
                 e.preventDefault()
                 e.stopPropagation()
                 setMenuOpen(false)
-                onRename(collection)
+                onEdit(collection)
               }}
               className="w-full text-left px-3 py-2 text-sm text-[var(--color-ink)] hover:bg-[var(--color-border)]/30 transition-colors cursor-pointer"
             >
-              Rename
+              Edit
             </button>
             <button
               onClick={(e) => {

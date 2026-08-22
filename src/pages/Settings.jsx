@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useTheme } from '../contexts/ThemeContext'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import Button from '../components/ui/Button'
+import ConfirmDialog from '../components/ui/ConfirmDialog'
 import { setUsername } from '../lib/users'
 
 const themes = [
@@ -13,7 +14,7 @@ const themes = [
 ]
 
 export default function Settings() {
-  const { user, userProfile, setUserProfile, loading: authLoading } = useAuth()
+  const { user, userProfile, setUserProfile, loading: authLoading, logout } = useAuth()
   const { theme, setTheme } = useTheme()
 
   const [usernameValue, setUsernameValue] = useState('')
@@ -21,6 +22,7 @@ export default function Settings() {
   const [usernameSuccess, setUsernameSuccess] = useState('')
   const [savingUsername, setSavingUsername] = useState(false)
   const [hasProfile, setHasProfile] = useState(null)
+  const [showLogout, setShowLogout] = useState(false)
 
   useEffect(() => { document.title = 'Settings | Meta Collections' }, [])
 
@@ -112,33 +114,39 @@ export default function Settings() {
 
         <section>
           <h3 className="text-sm font-medium text-[var(--color-ink)] mb-3">Appearance</h3>
-          <div className="space-y-2">
+          <div className="inline-flex rounded-lg border border-[var(--color-border)] overflow-hidden">
             {themes.map((t) => (
               <button
                 key={t.value}
                 onClick={() => setTheme(t.value)}
-                className={`w-full text-left px-4 py-3 rounded-lg border transition-colors cursor-pointer ${
+                className={`px-4 py-2 text-sm transition-colors cursor-pointer ${
                   theme === t.value
-                    ? 'border-[var(--color-ink)] bg-[var(--color-surface-raised)]'
-                    : 'border-[var(--color-border)] hover:border-[var(--color-border-hover)] bg-transparent'
+                    ? 'bg-[var(--color-surface-raised)] text-[var(--color-ink)] font-medium'
+                    : 'text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] hover:bg-[var(--color-border)]/30'
                 }`}
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-sm font-medium text-[var(--color-ink)]">{t.label}</span>
-                    <p className="text-xs text-[var(--color-ink-muted)] mt-0.5">{t.description}</p>
-                  </div>
-                  {theme === t.value && (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink)] shrink-0">
-                      <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                  )}
-                </div>
+                {t.label}
               </button>
             ))}
           </div>
         </section>
+
+        <section className="mt-10 pt-8 border-t border-[var(--color-border)]">
+          <Button onClick={() => setShowLogout(true)} variant="secondary" className="text-[var(--color-danger)] hover:text-[var(--color-danger)]">
+            Log out
+          </Button>
+        </section>
       </main>
+
+      <ConfirmDialog
+        open={showLogout}
+        onClose={() => setShowLogout(false)}
+        onConfirm={logout}
+        title="Log out"
+        message="Are you sure you want to log out?"
+        confirmLabel="Log out"
+        variant="primary"
+      />
     </div>
   )
 }

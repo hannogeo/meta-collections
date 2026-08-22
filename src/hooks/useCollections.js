@@ -12,6 +12,7 @@ import {
   increment,
   getDoc,
   getDocs,
+  where,
 } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 
@@ -55,7 +56,7 @@ export function useCollections(userId) {
     )
   }
 
-  async function createCollection(name, emoji) {
+  async function createCollection(name, emoji, visibility = 'private') {
     const activeCount = collections.length
     if (activeCount >= MAX_COLLECTIONS) {
       throw new Error(`Maximum of ${MAX_COLLECTIONS} collections reached`)
@@ -67,6 +68,7 @@ export function useCollections(userId) {
     const docRef = await addDoc(collection(db, 'users', userId, 'collections'), {
       name,
       emoji: emoji || null,
+      visibility,
       createdAt: serverTimestamp(),
       metaCount: 0,
       deletedAt: null,
@@ -75,12 +77,13 @@ export function useCollections(userId) {
     return docRef.id
   }
 
-  async function renameCollection(collectionId, newName, emoji) {
+  async function renameCollection(collectionId, newName, emoji, visibility) {
     if (isNameTaken(newName, collectionId)) {
       throw new Error('A collection with this name already exists')
     }
     const updates = { name: newName }
     if (emoji !== undefined) updates.emoji = emoji || null
+    if (visibility !== undefined) updates.visibility = visibility
     await updateDoc(doc(db, 'users', userId, 'collections', collectionId), updates)
   }
 
@@ -205,4 +208,13 @@ export async function resolveCollectionPath(username, collectionName) {
   if (data.deletedAt) return null
 
   return { uid, collectionId: doc.id, ...data }
+}
+
+export async function loadPublicMetas(uid, collectionId) {
+  const q = query(
+    collection(db, 'users', uid, 'collections', collectionId, 'metas'),
+    orderBy('order', 'asc')
+  )
+  const snapshot = await getDocs(q)
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
 }

@@ -230,32 +230,36 @@ export default function MetaCard({ meta, index, onEdit, onDelete }) {
           </div>
 
           <div className="relative shrink-0" ref={menuRef}>
-            <button
-              onClick={() => setMenuOpen((o) => !o)}
-              className="opacity-0 group-hover:opacity-100 w-6 h-6 flex items-center justify-center rounded text-[var(--color-ink-faint)] hover:text-[var(--color-ink)] hover:bg-[var(--color-border)]/40 transition-all cursor-pointer"
-            >
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-                <circle cx="8" cy="3" r="1.5"/>
-                <circle cx="8" cy="8" r="1.5"/>
-                <circle cx="8" cy="13" r="1.5"/>
-              </svg>
-            </button>
+            {onEdit && (
+              <>
+                <button
+                  onClick={() => setMenuOpen((o) => !o)}
+                  className="opacity-0 group-hover:opacity-100 w-6 h-6 flex items-center justify-center rounded text-[var(--color-ink-faint)] hover:text-[var(--color-ink)] hover:bg-[var(--color-border)]/40 transition-all cursor-pointer"
+                >
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                    <circle cx="8" cy="3" r="1.5"/>
+                    <circle cx="8" cy="8" r="1.5"/>
+                    <circle cx="8" cy="13" r="1.5"/>
+                  </svg>
+                </button>
 
-            {menuOpen && (
-              <div className="absolute right-0 top-full mt-1 bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-md shadow-sm py-1 min-w-[120px] z-20">
-                <button
-                  onClick={() => { setMenuOpen(false); onEdit(meta) }}
-                  className="w-full text-left px-3 py-2 text-sm text-[var(--color-ink)] hover:bg-[var(--color-border)]/30 transition-colors cursor-pointer"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => { setMenuOpen(false); setShowConfirm(true) }}
-                  className="w-full text-left px-3 py-2 text-sm text-[var(--color-danger)] hover:bg-[var(--color-danger)]/5 transition-colors cursor-pointer"
-                >
-                  Delete
-                </button>
-              </div>
+                {menuOpen && (
+                  <div className="absolute right-0 top-full mt-1 bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-md shadow-sm py-1 min-w-[120px] z-20">
+                    <button
+                      onClick={() => { setMenuOpen(false); onEdit(meta) }}
+                      className="w-full text-left px-3 py-2 text-sm text-[var(--color-ink)] hover:bg-[var(--color-border)]/30 transition-colors cursor-pointer"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => { setMenuOpen(false); setShowConfirm(true) }}
+                      className="w-full text-left px-3 py-2 text-sm text-[var(--color-danger)] hover:bg-[var(--color-danger)]/5 transition-colors cursor-pointer"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -295,13 +299,15 @@ export default function MetaCard({ meta, index, onEdit, onDelete }) {
         </div>
       )}
 
-      <ConfirmDialog
-        open={showConfirm}
-        onClose={() => setShowConfirm(false)}
-        onConfirm={() => onDelete(meta.id)}
-        title="Delete meta"
-        message="Remove this meta? Can't be undone."
-      />
+      {onDelete && (
+        <ConfirmDialog
+          open={showConfirm}
+          onClose={() => setShowConfirm(false)}
+          onConfirm={() => onDelete(meta.id)}
+          title="Delete meta"
+          message="Remove this meta? Can't be undone."
+        />
+      )}
     </>
   )
 }

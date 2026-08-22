@@ -11,39 +11,41 @@ import Button from '../components/ui/Button'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 
 export default function Dashboard() {
-  const { user, userProfile, loading: authLoading, logout } = useAuth()
+  const { user, userProfile, loading: authLoading } = useAuth()
   const { collections, loading, createCollection, renameCollection, updateEmoji, softDeleteCollection, MAX_COLLECTIONS } = useCollections(user?.uid)
   const [showCreate, setShowCreate] = useState(false)
-  const [renameTarget, setRenameTarget] = useState(null)
-  const [renameValue, setRenameValue] = useState('')
-  const [renameEmoji, setRenameEmoji] = useState('')
-  const [renameError, setRenameError] = useState('')
+  const [editTarget, setEditTarget] = useState(null)
+  const [editValue, setEditValue] = useState('')
+  const [editEmoji, setEditEmoji] = useState('')
+  const [editVisibility, setEditVisibility] = useState('private')
+  const [editError, setEditError] = useState('')
   const [deleteTarget, setDeleteTarget] = useState(null)
-  const [showLogout, setShowLogout] = useState(false)
 
   useEffect(() => { document.title = 'Dashboard | Meta Collections' }, [])
 
   if (authLoading) return <LoadingSpinner />
   if (!user) return <Navigate to="/login" />
 
-  function handleRename(col) {
-    setRenameTarget(col)
-    setRenameValue(col.name)
-    setRenameEmoji(col.emoji || '')
-    setRenameError('')
+  function handleEdit(col) {
+    setEditTarget(col)
+    setEditValue(col.name)
+    setEditEmoji(col.emoji || '')
+    setEditVisibility(col.visibility || 'private')
+    setEditError('')
   }
 
-  async function handleRenameSubmit(e) {
+  async function handleEditSubmit(e) {
     e.preventDefault()
-    if (!renameValue.trim() || !renameTarget) return
+    if (!editValue.trim() || !editTarget) return
     try {
-      await renameCollection(renameTarget.id, renameValue.trim(), renameEmoji)
-      setRenameTarget(null)
-      setRenameValue('')
-      setRenameEmoji('')
-      setRenameError('')
+      await renameCollection(editTarget.id, editValue.trim(), editEmoji, editVisibility)
+      setEditTarget(null)
+      setEditValue('')
+      setEditEmoji('')
+      setEditVisibility('private')
+      setEditError('')
     } catch (err) {
-      setRenameError(err.message)
+      setEditError(err.message)
     }
   }
 
@@ -55,9 +57,10 @@ export default function Dashboard() {
 
   const totalMetas = collections.reduce((sum, c) => sum + (c.metaCount || 0), 0)
 
-  const renameDisabled = !renameValue.trim() || (
-    renameValue.trim() === renameTarget?.name &&
-    renameEmoji === (renameTarget?.emoji || '')
+  const editDisabled = !editValue.trim() || (
+    editValue.trim() === editTarget?.name &&
+    editEmoji === (editTarget?.emoji || '') &&
+    editVisibility === (editTarget?.visibility || 'private')
   )
 
   return (
@@ -74,9 +77,6 @@ export default function Dashboard() {
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
               </svg>
             </Link>
-            <button onClick={() => setShowLogout(true)} className="text-xs text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors cursor-pointer">
-              Log out
-            </button>
           </div>
         </div>
       </header>
@@ -131,7 +131,7 @@ export default function Dashboard() {
                 key={col.id}
                 collection={col}
                 username={userProfile?.username}
-                onRename={handleRename}
+                onEdit={handleEdit}
                 onDelete={(col) => setDeleteTarget(col)}
                 onUpdateEmoji={updateEmoji}
               />
@@ -160,22 +160,69 @@ export default function Dashboard() {
         maxReached={collections.length >= MAX_COLLECTIONS}
       />
 
-      <Modal open={!!renameTarget} onClose={() => setRenameTarget(null)} title="Edit collection">
-        <form onSubmit={handleRenameSubmit} className="space-y-4">
-          {renameError && (
+      <Modal open={!!editTarget} onClose={() => setEditTarget(null)} title="Edit collection">
+        <form onSubmit={handleEditSubmit} className="space-y-4">
+          {editError && (
             <div className="text-sm text-[var(--color-danger)] bg-[var(--color-danger)]/5 border border-[var(--color-danger)]/20 px-3 py-2 rounded-md">
-              {renameError}
+              {editError}
             </div>
           )}
-          <EmojiPicker value={renameEmoji} onChange={setRenameEmoji} />
+          <EmojiPicker value={editEmoji} onChange={setEditEmoji} />
           <input
             type="text"
-            value={renameValue}
-            onChange={(e) => setRenameValue(e.target.value)}
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
             autoFocus
             className="w-full px-3 py-2 text-sm bg-transparent border border-[var(--color-border)] rounded-md text-[var(--color-ink)] placeholder:text-[var(--color-ink-faint)] focus:outline-none focus:border-[var(--color-ink)] transition-colors"
           />
-          <Button type="submit" disabled={renameDisabled} className="w-full">
+          <div>
+            <label className="block text-xs font-medium text-[var(--color-ink-muted)] mb-2 uppercase tracking-wider">
+              Visibility
+            </label>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setEditVisibility('private')}
+                className={`flex-1 px-3 py-2 text-sm rounded-md border transition-colors cursor-pointer ${
+                  editVisibility === 'private'
+                    ? 'border-[var(--color-ink)] bg-[var(--color-ink)] text-[var(--color-surface)]'
+                    : 'border-[var(--color-border)] text-[var(--color-ink-muted)] hover:border-[var(--color-border-hover)]'
+                }`}
+              >
+                <span className="flex items-center justify-center gap-1.5">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                  Private
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setEditVisibility('public')}
+                className={`flex-1 px-3 py-2 text-sm rounded-md border transition-colors cursor-pointer ${
+                  editVisibility === 'public'
+                    ? 'border-[var(--color-ink)] bg-[var(--color-ink)] text-[var(--color-surface)]'
+                    : 'border-[var(--color-border)] text-[var(--color-ink-muted)] hover:border-[var(--color-border-hover)]'
+                }`}
+              >
+                <span className="flex items-center justify-center gap-1.5">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="2" y1="12" x2="22" y2="12"/>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                  </svg>
+                  Public
+                </span>
+              </button>
+            </div>
+            <p className="text-xs text-[var(--color-ink-faint)] mt-1.5">
+              {editVisibility === 'private'
+                ? 'Only you can see this collection.'
+                : 'Anyone with the link can view this collection.'}
+            </p>
+          </div>
+          <Button type="submit" disabled={editDisabled} className="w-full">
             Save
           </Button>
         </form>
@@ -188,16 +235,6 @@ export default function Dashboard() {
         title="Move to trash?"
         message={`"${deleteTarget?.name}" will be moved to trash. You can restore it within 7 days.`}
         confirmLabel="Move to trash"
-      />
-
-      <ConfirmDialog
-        open={showLogout}
-        onClose={() => setShowLogout(false)}
-        onConfirm={logout}
-        title="Log out"
-        message="Are you sure you want to log out?"
-        confirmLabel="Log out"
-        variant="primary"
       />
     </div>
   )
