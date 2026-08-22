@@ -96,7 +96,7 @@ export default function Dashboard() {
         </div>
 
         {loading ? (
-          <LoadingSpinner />
+          <LoadingSpinner fullPage={false} />
         ) : collections.length === 0 ? (
           <div className="py-20">
             <div className="max-w-md">

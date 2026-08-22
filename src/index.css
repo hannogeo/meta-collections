@@ -93,3 +93,7 @@ input, textarea, select {
 .animate-map-pop-in {
   animation: map-pop-in 0.25s ease-out;
 }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
