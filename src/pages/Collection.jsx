@@ -12,7 +12,7 @@ import LoadingSpinner from '../components/ui/LoadingSpinner'
 export default function Collection() {
   const { username, collectionName } = useParams()
   const { user, loading: authLoading } = useAuth()
-  const { getMetas, addMeta, updateMeta, deleteMeta, updateEmoji, renameCollection, collections: ownerCollections, loading: collectionsLoading, MAX_METAS } = useCollections(user?.uid)
+  const { getMetas, addMeta, updateMeta, deleteMeta, updateEmoji, renameCollection, collections: ownerCollections, loading: collectionsLoading, loaded: collectionsLoaded, MAX_METAS } = useCollections(user?.uid)
 
   const [metas, setMetas] = useState([])
   const [metasLoading, setMetasLoading] = useState(true)
@@ -46,7 +46,7 @@ export default function Collection() {
   useEffect(() => {
     if (authLoading) return
 
-    if (user && !collectionsLoading) {
+    if (user && collectionsLoaded) {
       const found = ownerCollections.find(
         (c) => c.name.toLowerCase() === collectionName?.toLowerCase()
       )
@@ -66,7 +66,7 @@ export default function Collection() {
         return () => { cancelled = true }
       }
 
-      if (ownerCollections.length > 0 && !publicLoadAttempted.current) {
+      if (!publicLoadAttempted.current) {
         publicLoadAttempted.current = true
         loadPublic()
         return
@@ -77,7 +77,7 @@ export default function Collection() {
       publicLoadAttempted.current = true
       loadPublic()
     }
-  }, [user, authLoading, collectionsLoading, ownerCollections, collectionName])
+  }, [user, authLoading, collectionsLoaded, ownerCollections, collectionName])
 
   async function loadPublic() {
     try {

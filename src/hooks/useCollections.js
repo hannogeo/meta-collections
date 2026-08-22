@@ -15,6 +15,7 @@ import {
   where,
 } from 'firebase/firestore'
 import { db } from '../lib/firebase'
+import { getUserUid } from '../lib/users'
 
 const MAX_COLLECTIONS = 5
 const MAX_METAS = 1000
@@ -23,14 +24,19 @@ export function useCollections(userId) {
   const [collections, setCollections] = useState([])
   const [trashCollections, setTrashCollections] = useState([])
   const [loading, setLoading] = useState(true)
+  const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     if (!userId) {
       setCollections([])
       setTrashCollections([])
       setLoading(false)
+      setLoaded(false)
       return
     }
+
+    setLoading(true)
+    setLoaded(false)
 
     const q = query(
       collection(db, 'users', userId, 'collections'),
@@ -45,6 +51,7 @@ export function useCollections(userId) {
       setCollections(all.filter((c) => !c.deletedAt))
       setTrashCollections(all.filter((c) => c.deletedAt))
       setLoading(false)
+      setLoaded(true)
     })
 
     return unsubscribe
@@ -176,6 +183,7 @@ export function useCollections(userId) {
     collections,
     trashCollections,
     loading,
+    loaded,
     createCollection,
     renameCollection,
     updateEmoji,
@@ -198,7 +206,8 @@ export async function resolveCollectionPath(username, collectionName) {
 
   const q = query(
     collection(db, 'users', uid, 'collections'),
-    where('name', '==', collectionName)
+    where('name', '==', collectionName),
+    where('visibility', '==', 'public')
   )
   const snap = await getDocs(q)
   if (snap.empty) return null

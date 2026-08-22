@@ -1,0 +1,27 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && request.auth.uid == userId;
+
+      match /collections/{collectionId} {
+        allow list: if true;
+        allow get: if resource.data.visibility == 'public' || (request.auth != null && request.auth.uid == userId);
+        allow create, update, delete: if request.auth != null && request.auth.uid == userId;
+
+        match /metas/{metaId} {
+          allow list, get: if get(/databases/$(database)/documents/users/$(userId)/collections/$(collectionId)).data.visibility == 'public' || (request.auth != null && request.auth.uid == userId);
+          allow create, update, delete: if request.auth != null && request.auth.uid == userId;
+        }
+      }
+    }
+
+    match /usernames/{name} {
+      allow read: if true;
+      allow create, delete: if request.auth != null;
+    }
+  }
+}
