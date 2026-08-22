@@ -18,9 +18,9 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/collections/:id" element={<Collection />} />
             <Route path="/trash" element={<Trash />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/:username/:collectionName" element={<Collection />} />
             <Route path="/" element={<Dashboard />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

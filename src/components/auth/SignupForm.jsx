@@ -3,9 +3,11 @@ import { useAuth } from '../../contexts/AuthContext'
 import { Link, useNavigate } from 'react-router-dom'
 import Button from '../ui/Button'
 import PasswordInput from './PasswordInput'
+import { setUsername } from '../../lib/users'
 
 export default function SignupForm() {
   const [email, setEmail] = useState('')
+  const [username, setUsernameValue] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
@@ -17,6 +19,16 @@ export default function SignupForm() {
     e.preventDefault()
     setError('')
 
+    const trimmedUsername = username.trim()
+    if (!trimmedUsername) {
+      return setError('Username is required')
+    }
+    if (trimmedUsername.length < 3 || trimmedUsername.length > 20) {
+      return setError('Username must be 3-20 characters')
+    }
+    if (!/^[a-zA-Z0-9_-]+$/.test(trimmedUsername)) {
+      return setError('Username can only contain letters, numbers, - and _')
+    }
     if (password !== confirmPassword) {
       return setError('Passwords do not match')
     }
@@ -26,14 +38,19 @@ export default function SignupForm() {
 
     setLoading(true)
     try {
-      await signup(email, password)
+      const cred = await signup(email, password)
+      await setUsername(cred.user.uid, trimmedUsername)
       navigate('/dashboard')
     } catch (err) {
-      setError(
-        err.code === 'auth/email-already-in-use'
-          ? 'An account with this email already exists'
-          : 'Failed to create account'
-      )
+      if (err.message === 'Username is already taken') {
+        setError('Username is already taken')
+      } else {
+        setError(
+          err.code === 'auth/email-already-in-use'
+            ? 'An account with this email already exists'
+            : 'Failed to create account'
+        )
+      }
     }
     setLoading(false)
   }
@@ -53,6 +70,19 @@ export default function SignupForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          className="w-full px-3 py-2 text-sm bg-transparent border border-[var(--color-border)] rounded-md text-[var(--color-ink)] placeholder:text-[var(--color-ink-faint)] focus:outline-none focus:border-[var(--color-ink)] transition-colors"
+        />
+      </div>
+      <div>
+        <label htmlFor="signup-username" className="block text-xs font-medium text-[var(--color-ink-muted)] mb-1.5 uppercase tracking-wider">Username</label>
+        <input
+          id="signup-username"
+          type="text"
+          value={username}
+          onChange={(e) => setUsernameValue(e.target.value)}
+          required
+          maxLength={20}
+          placeholder="3-20 characters"
           className="w-full px-3 py-2 text-sm bg-transparent border border-[var(--color-border)] rounded-md text-[var(--color-ink)] placeholder:text-[var(--color-ink-faint)] focus:outline-none focus:border-[var(--color-ink)] transition-colors"
         />
       </div>

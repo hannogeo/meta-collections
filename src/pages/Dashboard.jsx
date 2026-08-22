@@ -11,12 +11,13 @@ import Button from '../components/ui/Button'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 
 export default function Dashboard() {
-  const { user, loading: authLoading, logout } = useAuth()
+  const { user, userProfile, loading: authLoading, logout } = useAuth()
   const { collections, loading, createCollection, renameCollection, updateEmoji, softDeleteCollection, MAX_COLLECTIONS } = useCollections(user?.uid)
   const [showCreate, setShowCreate] = useState(false)
   const [renameTarget, setRenameTarget] = useState(null)
   const [renameValue, setRenameValue] = useState('')
   const [renameEmoji, setRenameEmoji] = useState('')
+  const [renameError, setRenameError] = useState('')
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [showLogout, setShowLogout] = useState(false)
 
@@ -29,15 +30,21 @@ export default function Dashboard() {
     setRenameTarget(col)
     setRenameValue(col.name)
     setRenameEmoji(col.emoji || '')
+    setRenameError('')
   }
 
   async function handleRenameSubmit(e) {
     e.preventDefault()
     if (!renameValue.trim() || !renameTarget) return
-    await renameCollection(renameTarget.id, renameValue.trim(), renameEmoji)
-    setRenameTarget(null)
-    setRenameValue('')
-    setRenameEmoji('')
+    try {
+      await renameCollection(renameTarget.id, renameValue.trim(), renameEmoji)
+      setRenameTarget(null)
+      setRenameValue('')
+      setRenameEmoji('')
+      setRenameError('')
+    } catch (err) {
+      setRenameError(err.message)
+    }
   }
 
   async function handleSoftDelete() {
@@ -75,6 +82,16 @@ export default function Dashboard() {
       </header>
 
       <main className="max-w-3xl mx-auto px-6 py-10">
+        {!userProfile?.username && (
+          <div className="mb-6 px-4 py-3 bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg flex items-center justify-between">
+            <p className="text-sm text-[var(--color-ink-muted)]">
+              Pick a username to get started.
+            </p>
+            <Link to="/settings" className="text-sm text-[var(--color-ink)] font-medium hover:underline underline-offset-2 decoration-[var(--color-border)] hover:decoration-[var(--color-ink)] transition-colors">
+              Set username
+            </Link>
+          </div>
+        )}
         <div className="mb-10">
           <h2 className="text-2xl font-semibold tracking-tight text-[var(--color-ink)]">
             {collections.length === 0 ? 'Welcome' : 'Your collections'}
@@ -113,6 +130,7 @@ export default function Dashboard() {
               <CollectionCard
                 key={col.id}
                 collection={col}
+                username={userProfile?.username}
                 onRename={handleRename}
                 onDelete={(col) => setDeleteTarget(col)}
                 onUpdateEmoji={updateEmoji}
@@ -144,6 +162,11 @@ export default function Dashboard() {
 
       <Modal open={!!renameTarget} onClose={() => setRenameTarget(null)} title="Edit collection">
         <form onSubmit={handleRenameSubmit} className="space-y-4">
+          {renameError && (
+            <div className="text-sm text-[var(--color-danger)] bg-[var(--color-danger)]/5 border border-[var(--color-danger)]/20 px-3 py-2 rounded-md">
+              {renameError}
+            </div>
+          )}
           <EmojiPicker value={renameEmoji} onChange={setRenameEmoji} />
           <input
             type="text"

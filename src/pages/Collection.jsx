@@ -9,18 +9,20 @@ import Button from '../components/ui/Button'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 
 export default function Collection() {
-  const { id } = useParams()
+  const { username, collectionName } = useParams()
   const { user, loading: authLoading } = useAuth()
-  const { getMetas, addMeta, updateMeta, deleteMeta, updateEmoji, collections, MAX_METAS } = useCollections(user?.uid)
+  const { getMetas, addMeta, updateMeta, deleteMeta, updateEmoji, collections, loading: collectionsLoading, MAX_METAS } = useCollections(user?.uid)
   const [metas, setMetas] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [metasLoading, setMetasLoading] = useState(true)
   const [showAdd, setShowAdd] = useState(false)
   const [editingMeta, setEditingMeta] = useState(null)
   const [notFound, setNotFound] = useState(false)
   const navigate = useNavigate()
   const bottomRef = useRef(null)
 
-  const collection = collections.find((c) => c.id === id)
+  const collection = collections.find(
+    (c) => c.name.toLowerCase() === collectionName?.toLowerCase()
+  )
 
   useEffect(() => {
     if (collection?.name) {
@@ -30,54 +32,53 @@ export default function Collection() {
   }, [collection?.name])
 
   useEffect(() => {
-    if (!user || !id) return
+    if (collectionsLoading) return
+
+    if (!collection) {
+      if (collections.length === 0) return
+      setNotFound(true)
+      setMetasLoading(false)
+      return
+    }
 
     let cancelled = false
 
     async function load() {
       try {
-        const data = await getMetas(id)
+        const data = await getMetas(collection.id)
         if (!cancelled) setMetas(data)
       } catch {
         if (!cancelled) setNotFound(true)
       }
-      if (!cancelled) setLoading(false)
+      if (!cancelled) setMetasLoading(false)
     }
 
-    if (collections.length > 0 && !collection) {
-      setNotFound(true)
-      setLoading(false)
-      return
-    }
-
-    if (collections.length > 0) {
-      load()
-    }
-  }, [user, id, collections])
+    load()
+  }, [collection, collectionsLoading, collections])
 
   if (authLoading) return <LoadingSpinner />
   if (!user) return <Navigate to="/login" />
   if (notFound) return <Navigate to="/404" />
-  if (loading || collections.length === 0) return <LoadingSpinner />
+  if (collectionsLoading || metasLoading) return <LoadingSpinner />
 
   async function handleAdd(data) {
-    await addMeta(id, data)
-    const updated = await getMetas(id)
+    await addMeta(collection.id, data)
+    const updated = await getMetas(collection.id)
     setMetas(updated)
     setShowAdd(false)
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 100)
   }
 
   async function handleEdit(data) {
-    await updateMeta(id, editingMeta.id, data)
+    await updateMeta(collection.id, editingMeta.id, data)
     setEditingMeta(null)
-    const updated = await getMetas(id)
+    const updated = await getMetas(collection.id)
     setMetas(updated)
   }
 
   async function handleDelete(metaId) {
-    await deleteMeta(id, metaId)
-    const updated = await getMetas(id)
+    await deleteMeta(collection.id, metaId)
+    const updated = await getMetas(collection.id)
     setMetas(updated)
   }
 
@@ -92,18 +93,18 @@ export default function Collection() {
             &larr; All
           </button>
           <EmojiPicker
-            value={collection?.emoji || ''}
-            onChange={(emoji) => updateEmoji(id, emoji)}
+            value={collection.emoji || ''}
+            onChange={(emoji) => updateEmoji(collection.id, emoji)}
           >
             <div className="group/emoji relative w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[var(--color-border)]/50 transition-colors text-lg shrink-0 cursor-pointer" title="Change icon">
-              {collection?.emoji || (
+              {collection.emoji || (
                 <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-[var(--color-ink-faint)]">
                   <circle cx="10" cy="10" r="8" strokeDasharray="3 3"/>
                 </svg>
               )}
-              {collection?.emoji && (
+              {collection.emoji && (
                 <span
-                  onClick={(e) => { e.stopPropagation(); updateEmoji(id, '') }}
+                  onClick={(e) => { e.stopPropagation(); updateEmoji(collection.id, '') }}
                   className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-[var(--color-surface-raised)] border border-[var(--color-border)] text-[var(--color-ink-muted)] hover:text-[var(--color-danger)] hover:border-[var(--color-danger)]/30 flex items-center justify-center cursor-pointer text-[10px] leading-none transition-all opacity-0 group-hover/emoji:opacity-100 pointer-events-none group-hover/emoji:pointer-events-auto"
                   title="Remove icon"
                 >
@@ -113,7 +114,7 @@ export default function Collection() {
             </div>
           </EmojiPicker>
           <h1 className="text-sm font-semibold tracking-tight text-[var(--color-ink)] truncate flex-1">
-            {collection?.name || 'Collection'}
+            {collection.name}
           </h1>
           <span className="text-xs tabular-nums text-[var(--color-ink-faint)] shrink-0">
             {metas.length}/{MAX_METAS}

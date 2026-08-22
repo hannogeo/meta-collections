@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import EmojiPicker from './EmojiPicker'
 
-export default function CollectionCard({ collection, onRename, onDelete, onUpdateEmoji }) {
+export default function CollectionCard({ collection, username, onRename, onDelete, onUpdateEmoji }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef(null)
 
@@ -20,7 +20,7 @@ export default function CollectionCard({ collection, onRename, onDelete, onUpdat
   return (
     <div className="group relative bg-[var(--color-surface-raised)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] rounded-lg p-4 transition-all flex items-center">
       <Link
-        to={`/collections/${collection.id}`}
+        to={`/${username}/${collection.name}`}
         className="absolute inset-0 rounded-lg z-0"
         tabIndex={-1}
       />

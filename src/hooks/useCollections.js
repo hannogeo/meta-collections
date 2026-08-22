@@ -49,10 +49,19 @@ export function useCollections(userId) {
     return unsubscribe
   }, [userId])
 
+  function isNameTaken(name, excludeId) {
+    return collections.some(
+      (c) => c.name.toLowerCase() === name.toLowerCase() && c.id !== excludeId
+    )
+  }
+
   async function createCollection(name, emoji) {
     const activeCount = collections.length
     if (activeCount >= MAX_COLLECTIONS) {
       throw new Error(`Maximum of ${MAX_COLLECTIONS} collections reached`)
+    }
+    if (isNameTaken(name)) {
+      throw new Error('A collection with this name already exists')
     }
 
     const docRef = await addDoc(collection(db, 'users', userId, 'collections'), {
@@ -67,6 +76,9 @@ export function useCollections(userId) {
   }
 
   async function renameCollection(collectionId, newName, emoji) {
+    if (isNameTaken(newName, collectionId)) {
+      throw new Error('A collection with this name already exists')
+    }
     const updates = { name: newName }
     if (emoji !== undefined) updates.emoji = emoji || null
     await updateDoc(doc(db, 'users', userId, 'collections', collectionId), updates)
@@ -175,4 +187,22 @@ export function useCollections(userId) {
     MAX_COLLECTIONS,
     MAX_METAS,
   }
+}
+
+export async function resolveCollectionPath(username, collectionName) {
+  const uid = await getUserUid(username.toLowerCase())
+  if (!uid) return null
+
+  const q = query(
+    collection(db, 'users', uid, 'collections'),
+    where('name', '==', collectionName)
+  )
+  const snap = await getDocs(q)
+  if (snap.empty) return null
+
+  const doc = snap.docs[0]
+  const data = doc.data()
+  if (data.deletedAt) return null
+
+  return { uid, collectionId: doc.id, ...data }
 }
