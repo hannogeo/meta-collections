@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import { useAuth } from '../contexts/AuthContext'
 import Button from '../components/ui/Button'
@@ -216,26 +216,20 @@ export default function Home() {
 
   useEffect(() => { document.title = 'Meta Collections' }, [])
 
+  if (user) return <Navigate to="/dashboard" replace />
+
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 bg-[var(--color-surface)]/80 backdrop-blur-md border-b border-[var(--color-border)]">
         <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
           <span className="text-sm font-semibold tracking-tight text-[var(--color-ink)]">Meta Collections</span>
           <div className="flex items-center gap-3">
-            {user ? (
-              <Link to="/dashboard">
-                <Button>Dashboard</Button>
-              </Link>
-            ) : (
-              <>
-                <Link to="/login" className="text-sm text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors">
-                  Log in
-                </Link>
-                <Link to="/signup">
-                  <Button>Sign up</Button>
-                </Link>
-              </>
-            )}
+            <Link to="/login" className="text-sm text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors">
+              Log in
+            </Link>
+            <Link to="/signup">
+              <Button>Sign up</Button>
+            </Link>
           </div>
         </div>
       </header>
@@ -252,14 +246,12 @@ export default function Home() {
               you can actually find them.
             </p>
             <div className="flex items-center gap-3 mt-8">
-              <Link to={user ? '/dashboard' : '/signup'}>
-                <Button>{user ? 'Go to Dashboard' : 'Get started'}</Button>
+              <Link to="/signup">
+                <Button>Get started</Button>
               </Link>
-              {!user && (
-                <Link to="/login" className="text-sm text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors px-3 py-2">
-                  Already have an account?
-                </Link>
-              )}
+              <Link to="/login" className="text-sm text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors px-3 py-2">
+                Already have an account?
+              </Link>
             </div>
           </div>
         </section>
