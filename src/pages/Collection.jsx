@@ -225,6 +225,13 @@ export default function Collection() {
             </a>
           </div>
         )}
+        {user && !canEdit && (
+          <div className="mb-8 px-4 py-3 bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg">
+            <p className="text-sm text-[var(--color-ink-muted)]">
+              This is a public collection by <span className="text-[var(--color-ink)] font-medium">{username}</span>. Read-only.
+            </p>
+          </div>
+        )}
 
         {metas.length === 0 ? (
           <div className="py-20">

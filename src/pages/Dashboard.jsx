@@ -82,16 +82,6 @@ export default function Dashboard() {
       </header>
 
       <main className="max-w-3xl mx-auto px-6 py-10">
-        {!userProfile?.username && (
-          <div className="mb-6 px-4 py-3 bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg flex items-center justify-between">
-            <p className="text-sm text-[var(--color-ink-muted)]">
-              Pick a username to get started.
-            </p>
-            <Link to="/settings" className="text-sm text-[var(--color-ink)] font-medium hover:underline underline-offset-2 decoration-[var(--color-border)] hover:decoration-[var(--color-ink)] transition-colors">
-              Set username
-            </Link>
-          </div>
-        )}
         <div className="mb-10">
           <h2 className="text-2xl font-semibold tracking-tight text-[var(--color-ink)]">
             {collections.length === 0 ? 'Welcome' : 'Your collections'}

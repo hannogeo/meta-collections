@@ -12,7 +12,6 @@ import {
   increment,
   getDoc,
   getDocs,
-  where,
 } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { getUserUid } from '../lib/users'
@@ -204,19 +203,18 @@ export async function resolveCollectionPath(username, collectionName) {
   const uid = await getUserUid(username.toLowerCase())
   if (!uid) return null
 
-  const q = query(
-    collection(db, 'users', uid, 'collections'),
-    where('name', '==', collectionName),
-    where('visibility', '==', 'public')
-  )
+  const q = query(collection(db, 'users', uid, 'collections'))
   const snap = await getDocs(q)
-  if (snap.empty) return null
 
-  const doc = snap.docs[0]
-  const data = doc.data()
-  if (data.deletedAt) return null
+  const match = snap.docs.find((d) => {
+    const data = d.data()
+    return data.name.toLowerCase() === collectionName.toLowerCase()
+      && data.visibility === 'public'
+      && !data.deletedAt
+  })
+  if (!match) return null
 
-  return { uid, collectionId: doc.id, ...data }
+  return { uid, collectionId: match.id, ...match.data() }
 }
 
 export async function loadPublicMetas(uid, collectionId) {
