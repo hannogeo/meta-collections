@@ -1,7 +1,24 @@
 import { useState, useEffect, useRef } from 'react'
-import { MapContainer, TileLayer, Marker, Polygon } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker } from 'react-leaflet'
+import L from 'leaflet'
 import FitBounds from './FitBounds'
 import ConfirmDialog from '../ui/ConfirmDialog'
+
+const PIN_COLORS = ['#e53935', '#1e88e5', '#43a047']
+
+function createPinIcon(color) {
+  return L.divIcon({
+    html: `<svg width="25" height="34" viewBox="0 0 25 34" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12.5 0C5.6 0 0 5.6 0 12.5C0 22.5 12.5 34 12.5 34S25 22.5 25 12.5C25 5.6 19.4 0 12.5 0Z" fill="${color}"/>
+      <circle cx="12.5" cy="12" r="4.5" fill="white"/>
+    </svg>`,
+    className: '',
+    iconSize: [25, 34],
+    iconAnchor: [12.5, 34],
+  })
+}
+
+const pinIcons = PIN_COLORS.map((c) => createPinIcon(c))
 
 export default function MetaCard({ meta, index, onEdit, onDelete }) {
   const [showConfirm, setShowConfirm] = useState(false)
@@ -36,13 +53,10 @@ export default function MetaCard({ meta, index, onEdit, onDelete }) {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <FitBounds markers={meta.mapData.markers} polygon={meta.mapData.polygon} />
+        <FitBounds markers={meta.mapData.markers} />
         {meta.mapData.markers?.map((m, i) => (
-          <Marker key={i} position={[m.lat, m.lng]} />
+          <Marker key={i} position={[m.lat, m.lng]} icon={pinIcons[i]} />
         ))}
-        {meta.mapData.polygon && (
-          <Polygon positions={meta.mapData.polygon} />
-        )}
       </>
     )
   }
@@ -79,7 +93,7 @@ export default function MetaCard({ meta, index, onEdit, onDelete }) {
                 {!expanded && (
                   <button
                     onClick={() => setExpanded(true)}
-                    className="absolute top-2 right-2 z-10 w-7 h-7 flex items-center justify-center rounded bg-[var(--color-surface-raised)] border border-[var(--color-border)] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] hover:bg-[var(--color-surface)] shadow-sm transition-colors cursor-pointer"
+                    className="absolute top-2 right-2 z-[5] w-7 h-7 flex items-center justify-center rounded bg-[var(--color-surface-raised)] border border-[var(--color-border)] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] hover:bg-[var(--color-surface)] shadow-sm transition-colors cursor-pointer"
                     title="Expand map"
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

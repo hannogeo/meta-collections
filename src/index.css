@@ -70,10 +70,37 @@ input, textarea, select {
   font-family: inherit;
 }
 
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-hover) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--color-border-hover);
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ink-faint);
+}
+
 .leaflet-container {
   width: 100%;
   height: 100%;
   z-index: 0;
+}
+
+.leaflet-marker-icon {
+  cursor: grab !important;
 }
 
 @keyframes overlay-in {

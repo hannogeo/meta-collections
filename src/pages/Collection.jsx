@@ -203,17 +203,18 @@ export default function Collection() {
           <span className="text-xs tabular-nums text-[var(--color-ink-faint)] shrink-0">
             {metas.length}/{MAX_METAS}
           </span>
+          {canEdit && (
+            <button
+              onClick={() => setShowAdd(true)}
+              className="text-xs font-medium text-[var(--color-surface)] bg-[var(--color-ink)] rounded-md px-3 py-1.5 hover:bg-[var(--color-accent-hover)] transition-colors cursor-pointer shrink-0"
+            >
+              +{' '}Add meta
+            </button>
+          )}
         </div>
       </header>
 
       <main className="max-w-3xl mx-auto px-6 py-10">
-        {canEdit && (
-          <div className="flex justify-center mb-10">
-            <Button onClick={() => setShowAdd(true)}>
-              Add meta
-            </Button>
-          </div>
-        )}
 
         {!user && (
           <div className="mb-8 px-4 py-3 bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg flex items-center justify-between">
@@ -236,9 +237,20 @@ export default function Collection() {
         {metas.length === 0 ? (
           <div className="py-20">
             <div className="max-w-sm mx-auto text-center">
-              <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed">
-                {canEdit ? 'No metas yet. Add your first tip, trick, or location marker above.' : 'No metas in this collection yet.'}
-              </p>
+              {canEdit ? (
+                <>
+                  <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed mb-6">
+                    No metas yet. Add your first tip, trick, or location marker.
+                  </p>
+                  <Button onClick={() => setShowAdd(true)} className="text-base px-6 py-3">
+                    Add your first meta
+                  </Button>
+                </>
+              ) : (
+                <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed">
+                  No metas in this collection yet.
+                </p>
+              )}
             </div>
           </div>
         ) : (

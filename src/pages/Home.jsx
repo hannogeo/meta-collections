@@ -1,8 +1,25 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
+import L from 'leaflet'
 import { useAuth } from '../contexts/AuthContext'
 import Button from '../components/ui/Button'
+
+const PIN_COLORS = ['#e53935', '#1e88e5', '#43a047']
+
+function createPinIcon(color) {
+  return L.divIcon({
+    html: `<svg width="25" height="34" viewBox="0 0 25 34" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12.5 0C5.6 0 0 5.6 0 12.5C0 22.5 12.5 34 12.5 34S25 22.5 25 12.5C25 5.6 19.4 0 12.5 0Z" fill="${color}"/>
+      <circle cx="12.5" cy="12" r="4.5" fill="white"/>
+    </svg>`,
+    className: '',
+    iconSize: [25, 34],
+    iconAnchor: [12.5, 34],
+  })
+}
+
+const pinIcons = PIN_COLORS.map((c) => createPinIcon(c))
 
 function TiltCard({ children, glossIntensity = 0.07 }) {
   const ref = useRef(null)
@@ -90,6 +107,9 @@ function CollectionMockup() {
           Private
         </span>
         <span className="text-[11px] tabular-nums text-[var(--color-ink-faint)]">2/1000</span>
+        <span className="text-xs font-medium text-[var(--color-surface)] bg-[var(--color-ink)] rounded-md px-3 py-1.5 shrink-0">
+          + Add meta
+        </span>
       </div>
       <div className="px-8 py-6 space-y-3">
         <MockMeta
@@ -98,6 +118,7 @@ function CollectionMockup() {
           center={[58.8, 25.5]}
           zoom={5}
           example="Estonia"
+          pinIndex={0}
         />
         <MockMeta
           number={2}
@@ -105,6 +126,7 @@ function CollectionMockup() {
           center={[52.15, 5.3]}
           zoom={5}
           example="The Netherlands"
+          pinIndex={1}
         />
       </div>
     </div>
@@ -141,7 +163,7 @@ function MockCard({ emoji, name, metas, visibility }) {
   )
 }
 
-function MockMeta({ number, text, center, zoom, example }) {
+function MockMeta({ number, text, center, zoom, example, pinIndex = 0 }) {
   return (
     <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg p-4">
       <div className="flex gap-3">
@@ -153,7 +175,7 @@ function MockMeta({ number, text, center, zoom, example }) {
           <div className="mt-3 h-36 rounded-md border border-[var(--color-border)] overflow-hidden pointer-events-none">
             <MapContainer center={center} zoom={zoom} scrollWheelZoom={false} attributionControl={false} zoomControl={false} dragging={false} doubleClickZoom={false} touchZoom={false} keyboard={false} style={{ height: '100%', width: '100%' }}>
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              <Marker position={center} />
+              <Marker position={center} icon={pinIcons[pinIndex]} />
             </MapContainer>
           </div>
           <div className="mt-2 flex items-center gap-1.5 text-[11px] text-[var(--color-ink-faint)]">
@@ -270,7 +292,7 @@ export default function Home() {
             <Feature
               icon={<PinIcon />}
               title="Mark things on a map"
-              description="Explain your meta and drop a pin or draw a polygon on the map."
+              description="Explain your meta and drop up to 3 pins on the map to show exactly where to plonk."
             />
             <Feature
               icon={<LinkIcon />}
