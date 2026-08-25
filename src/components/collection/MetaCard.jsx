@@ -20,7 +20,18 @@ function createPinIcon(color) {
 
 const pinIcons = PIN_COLORS.map((c) => createPinIcon(c))
 
-export default function MetaCard({ meta, index, onEdit, onDelete }) {
+function highlightText(text, term) {
+  if (!term) return text
+  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const parts = text.split(new RegExp(`(${escaped})`, 'gi'))
+  return parts.map((part, i) =>
+    part.toLowerCase() === term.toLowerCase()
+      ? <mark key={i} className="bg-[var(--color-ink)] text-[var(--color-surface)] rounded px-0.5">{part}</mark>
+      : part
+  )
+}
+
+export default function MetaCard({ meta, index, onEdit, onDelete, highlight }) {
   const [showConfirm, setShowConfirm] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [expanded, setExpanded] = useState(false)
@@ -71,7 +82,7 @@ export default function MetaCard({ meta, index, onEdit, onDelete }) {
           <div className="flex-1 min-w-0 space-y-3">
             {meta.text && (
               <p className="text-sm text-[var(--color-ink)] whitespace-pre-wrap break-words leading-relaxed">
-                {meta.text}
+                {highlight ? highlightText(meta.text, highlight) : meta.text}
               </p>
             )}
 
@@ -86,6 +97,7 @@ export default function MetaCard({ meta, index, onEdit, onDelete }) {
                     dragging={true}
                     doubleClickZoom={false}
                     touchZoom={true}
+                    className="collection-map"
                   >
                     {renderMap()}
                   </MapContainer>
@@ -183,6 +195,7 @@ export default function MetaCard({ meta, index, onEdit, onDelete }) {
               dragging={true}
               doubleClickZoom={true}
               touchZoom={true}
+              className="collection-map"
             >
               {renderMap()}
             </MapContainer>

@@ -61,7 +61,7 @@ export default function MapEditor({ value, onChange }) {
           center={[0, 0]}
           zoom={2}
           style={{ height: '100%', width: '100%' }}
-          className="z-0"
+          className="z-0 collection-map"
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

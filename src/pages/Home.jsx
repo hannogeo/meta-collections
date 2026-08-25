@@ -98,18 +98,24 @@ function DashboardMockup() {
 
 function CollectionMockup() {
   return (
-    <div className="bg-[var(--color-surface)]">
-      <div className="h-11 border-b border-[var(--color-border)] flex items-center px-5 gap-3">
-        <span className="text-xs text-[var(--color-ink-muted)]">{'\u2190'} All</span>
-        <span className="text-lg">{'\u{1F3F0}'}</span>
-        <span className="text-xs font-semibold tracking-tight text-[var(--color-ink)]">Europe</span>
-        <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border border-[var(--color-border)] text-[var(--color-ink-faint)] ml-auto">
-          Private
-        </span>
-        <span className="text-[11px] tabular-nums text-[var(--color-ink-faint)]">2/1000</span>
-        <span className="text-xs font-medium text-[var(--color-surface)] bg-[var(--color-ink)] rounded-md px-3 py-1.5 shrink-0">
-          + Add meta
-        </span>
+    <div className="bg-[var(--color-surface)] relative">
+      <div className="h-11 border-b border-[var(--color-border)] grid grid-cols-3 items-center px-5">
+        <div className="flex items-center gap-3 min-w-0">
+          <span className="text-xs text-[var(--color-ink-muted)]">{'\u2190'} All</span>
+          <span className="text-lg">{'\u{1F3F0}'}</span>
+          <span className="text-xs font-semibold tracking-tight text-[var(--color-ink)]">Europe</span>
+          <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border border-[var(--color-border)] text-[var(--color-ink-faint)] shrink-0">
+            Private
+          </span>
+        </div>
+        <div className="flex justify-center">
+          <span className="text-[11px] font-medium text-[var(--color-surface)] bg-[var(--color-ink)] rounded-md px-2.5 py-1">
+            + Add meta
+          </span>
+        </div>
+        <div className="flex justify-end">
+          <span className="text-[11px] tabular-nums text-[var(--color-ink-faint)]">2/1000</span>
+        </div>
       </div>
       <div className="px-8 py-6 space-y-3">
         <MockMeta
@@ -173,7 +179,7 @@ function MockMeta({ number, text, center, zoom, example, pinIndex = 0 }) {
         <div className="flex-1 min-w-0">
           <p className="text-xs text-[var(--color-ink)] leading-relaxed">{text}</p>
           <div className="mt-3 h-36 rounded-md border border-[var(--color-border)] overflow-hidden pointer-events-none">
-            <MapContainer center={center} zoom={zoom} scrollWheelZoom={false} attributionControl={false} zoomControl={false} dragging={false} doubleClickZoom={false} touchZoom={false} keyboard={false} style={{ height: '100%', width: '100%' }}>
+            <MapContainer center={center} zoom={zoom} scrollWheelZoom={false} attributionControl={false} zoomControl={false} dragging={false} doubleClickZoom={false} touchZoom={false} keyboard={false} style={{ height: '100%', width: '100%' }} className="mock-map">
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
               <Marker position={center} icon={pinIcons[pinIndex]} />
             </MapContainer>

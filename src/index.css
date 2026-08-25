@@ -99,8 +99,12 @@ input, textarea, select {
   z-index: 0;
 }
 
-.leaflet-marker-icon {
+.collection-map .leaflet-marker-icon {
   cursor: grab !important;
+}
+
+.mock-map .leaflet-marker-icon {
+  cursor: default !important;
 }
 
 @keyframes overlay-in {

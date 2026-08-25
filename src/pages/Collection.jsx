@@ -25,6 +25,7 @@ export default function Collection() {
   const [renameVisibility, setRenameVisibility] = useState('private')
   const [renameError, setRenameError] = useState('')
   const [publicCollection, setPublicCollection] = useState(null)
+  const [search, setSearch] = useState('')
   const navigate = useNavigate()
   const bottomRef = useRef(null)
   const publicLoadAttempted = useRef(false)
@@ -148,71 +149,101 @@ export default function Collection() {
 
   const canEdit = user && !!ownerMatch
 
+  const filteredMetas = search.trim()
+    ? metas.filter((m) => m.text?.toLowerCase().includes(search.trim().toLowerCase()))
+    : metas
+
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 bg-[var(--color-surface)]/80 backdrop-blur-md border-b border-[var(--color-border)]">
-        <div className="max-w-3xl mx-auto px-6 h-14 flex items-center gap-4 group">
-          <button
-            onClick={() => user ? navigate('/dashboard') : navigate('/')}
-            className="text-xs text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors cursor-pointer"
-          >
-            &larr; {user ? 'All' : 'Home'}
-          </button>
-          {canEdit && (
-            <EmojiPicker
-              value={collection.emoji || ''}
-              onChange={(emoji) => updateEmoji(collectionId, emoji)}
-            >
-              <div className="group/emoji relative w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[var(--color-border)]/50 transition-colors text-lg shrink-0 cursor-pointer" title="Change icon">
-                {collection.emoji || (
-                  <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-[var(--color-ink-faint)]">
-                    <circle cx="10" cy="10" r="8" strokeDasharray="3 3"/>
-                  </svg>
-                )}
-                {collection.emoji && (
-                  <span
-                    onClick={(e) => { e.stopPropagation(); updateEmoji(collectionId, '') }}
-                    className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-[var(--color-surface-raised)] border border-[var(--color-border)] text-[var(--color-ink-muted)] hover:text-[var(--color-danger)] hover:border-[var(--color-danger)]/30 flex items-center justify-center cursor-pointer text-[10px] leading-none transition-all opacity-0 group-hover/emoji:opacity-100 pointer-events-none group-hover/emoji:pointer-events-auto"
-                    title="Remove icon"
-                  >
-                    &times;
-                  </span>
-                )}
-              </div>
-            </EmojiPicker>
-          )}
-          {collection.emoji && !canEdit && (
-            <span className="text-lg shrink-0">{collection.emoji}</span>
-          )}
-          <button
-            onClick={canEdit ? openRename : undefined}
-            className={`text-sm font-semibold tracking-tight text-[var(--color-ink)] truncate flex-1 text-left ${canEdit ? 'hover:underline underline-offset-2 decoration-[var(--color-border)] hover:decoration-[var(--color-ink)] transition-colors cursor-pointer' : ''}`}
-          >
-            {collection.name}
-          </button>
-          {collection.visibility === 'public' && (
-            <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border border-[var(--color-border)] text-[var(--color-ink-faint)] shrink-0">
-              Public
-            </span>
-          )}
-          {collection.visibility === 'private' && canEdit && (
-            <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border border-[var(--color-border)] text-[var(--color-ink-faint)] shrink-0">
-              Private
-            </span>
-          )}
-          <span className="text-xs tabular-nums text-[var(--color-ink-faint)] shrink-0">
-            {metas.length}/{MAX_METAS}
-          </span>
-          {canEdit && (
+        <div className="max-w-3xl mx-auto px-6 h-14 grid grid-cols-3 items-center group">
+          <div className="flex items-center gap-3 min-w-0">
             <button
-              onClick={() => setShowAdd(true)}
-              className="text-xs font-medium text-[var(--color-surface)] bg-[var(--color-ink)] rounded-md px-3 py-1.5 hover:bg-[var(--color-accent-hover)] transition-colors cursor-pointer shrink-0"
+              onClick={() => user ? navigate('/dashboard') : navigate('/')}
+              className="text-xs text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors cursor-pointer shrink-0"
             >
-              +{' '}Add meta
+              &larr; {user ? 'All' : 'Home'}
             </button>
-          )}
+            {canEdit && (
+              <EmojiPicker
+                value={collection.emoji || ''}
+                onChange={(emoji) => updateEmoji(collectionId, emoji)}
+              >
+                <div className="group/emoji relative w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[var(--color-border)]/50 transition-colors text-lg shrink-0 cursor-pointer" title="Change icon">
+                  {collection.emoji || (
+                    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-[var(--color-ink-faint)]">
+                      <circle cx="10" cy="10" r="8" strokeDasharray="3 3"/>
+                    </svg>
+                  )}
+                  {collection.emoji && (
+                    <span
+                      onClick={(e) => { e.stopPropagation(); updateEmoji(collectionId, '') }}
+                      className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-[var(--color-surface-raised)] border border-[var(--color-border)] text-[var(--color-ink-muted)] hover:text-[var(--color-danger)] hover:border-[var(--color-danger)]/30 flex items-center justify-center cursor-pointer text-[10px] leading-none transition-all opacity-0 group-hover/emoji:opacity-100 pointer-events-none group-hover/emoji:pointer-events-auto"
+                      title="Remove icon"
+                    >
+                      &times;
+                    </span>
+                  )}
+                </div>
+              </EmojiPicker>
+            )}
+            {collection.emoji && !canEdit && (
+              <span className="text-lg shrink-0">{collection.emoji}</span>
+            )}
+            <button
+              onClick={canEdit ? openRename : undefined}
+              className={`text-sm font-semibold tracking-tight text-[var(--color-ink)] truncate ${canEdit ? 'hover:underline underline-offset-2 decoration-[var(--color-border)] hover:decoration-[var(--color-ink)] transition-colors cursor-pointer' : ''}`}
+            >
+              {collection.name}
+            </button>
+            {collection.visibility === 'public' && (
+              <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border border-[var(--color-border)] text-[var(--color-ink-faint)] shrink-0">
+                Public
+              </span>
+            )}
+            {collection.visibility === 'private' && canEdit && (
+              <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border border-[var(--color-border)] text-[var(--color-ink-faint)] shrink-0">
+                Private
+              </span>
+            )}
+          </div>
+          <div className="flex justify-center">
+            {canEdit && (
+              <button
+                onClick={() => setShowAdd(true)}
+                className="text-xs font-medium text-[var(--color-surface)] bg-[var(--color-ink)] rounded-md px-3 py-1.5 hover:bg-[var(--color-accent-hover)] transition-colors cursor-pointer"
+              >
+                +{' '}Add meta
+              </button>
+            )}
+          </div>
+          <div className="flex justify-end">
+            <span className="text-xs tabular-nums text-[var(--color-ink-faint)]">
+              {metas.length}/{MAX_METAS}
+            </span>
+          </div>
         </div>
       </header>
+
+      {metas.length > 0 && (
+        <div className="fixed top-16 right-6 z-[8]">
+          {metas.length > 2 && (
+            <div className="relative">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--color-ink-faint)] pointer-events-none">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search metas..."
+                className="w-44 pl-8 pr-3 py-1.5 text-xs bg-transparent border border-[var(--color-border)] rounded-md text-[var(--color-ink)] placeholder:text-[var(--color-ink-faint)] focus:outline-none focus:border-[var(--color-ink)] focus:w-60 transition-all"
+              />
+            </div>
+          )}
+        </div>
+      )}
 
       <main className="max-w-3xl mx-auto px-6 py-10">
 
@@ -255,17 +286,23 @@ export default function Collection() {
           </div>
         ) : (
           <div className="space-y-4">
-            {metas.map((meta, i) => (
-              <MetaCard
-                key={meta.id}
-                meta={meta}
-                index={i + 1}
-                onEdit={canEdit ? (m) => setEditingMeta(m) : null}
-                onDelete={canEdit ? handleDelete : null}
-              />
-            ))}
-            <div ref={bottomRef} />
-          </div>
+              {filteredMetas.map((meta, i) => (
+                <MetaCard
+                  key={meta.id}
+                  meta={meta}
+                  index={metas.indexOf(meta) + 1}
+                  onEdit={canEdit ? (m) => setEditingMeta(m) : null}
+                  onDelete={canEdit ? handleDelete : null}
+                  highlight={search.trim() || null}
+                />
+              ))}
+              {search.trim() && filteredMetas.length === 0 && (
+                <p className="text-sm text-[var(--color-ink-muted)] text-center py-10">
+                  No metas match &ldquo;{search.trim()}&rdquo;
+                </p>
+              )}
+              <div ref={bottomRef} />
+            </div>
         )}
       </main>
 
