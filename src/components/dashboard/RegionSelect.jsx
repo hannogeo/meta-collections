@@ -1,13 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { WORLD, COUNTRIES, getRegion } from '../../lib/regions'
-
-function Flag({ code }) {
-  if (code === WORLD.code) {
-    return <span className="text-base leading-none shrink-0">{'\u{1F30D}'}</span>
-  }
-  return <span className={`fi fi-${code.toLowerCase()} shrink-0`} />
-}
+import Flag from '../ui/Flag'
 
 export default function RegionSelect({ value, onChange, clearable = false }) {
   const ref = useRef(null)

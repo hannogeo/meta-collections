@@ -10,6 +10,7 @@ import Modal from '../components/ui/Modal'
 import Button from '../components/ui/Button'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import CollectionSettings from '../components/dashboard/CollectionSettings'
+import AvatarMenu from '../components/ui/AvatarMenu'
 
 export default function Dashboard() {
   const { user, userProfile, loading: authLoading } = useAuth()
@@ -82,12 +83,7 @@ export default function Dashboard() {
             Meta Collections
           </Link>
           <div className="flex items-center gap-4">
-            <Link to="/settings" className="text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors" title="Settings">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-              </svg>
-            </Link>
+            <AvatarMenu />
           </div>
         </div>
       </header>
@@ -126,7 +122,7 @@ export default function Dashboard() {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          <div className="space-y-3">
             {collections.map((col) => (
               <CollectionCard
                 key={col.id}
@@ -140,13 +136,13 @@ export default function Dashboard() {
             {collections.length < MAX_COLLECTIONS && (
               <button
                 onClick={() => setShowCreate(true)}
-                className="border border-dashed border-[var(--color-border)] hover:border-[var(--color-border-hover)] rounded-lg p-5 flex flex-col items-center justify-center gap-2 text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] transition-colors cursor-pointer min-h-[100px]"
+                className="w-full border border-dashed border-[var(--color-border)] hover:border-[var(--color-border-hover)] rounded-lg p-4 flex items-center gap-3 text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] transition-colors cursor-pointer"
               >
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="shrink-0">
                   <line x1="10" y1="4" x2="10" y2="16"/>
                   <line x1="4" y1="10" x2="16" y2="10"/>
                 </svg>
-                <span className="text-xs font-medium">New collection</span>
+                <span className="text-sm font-medium">New collection</span>
               </button>
             )}
           </div>

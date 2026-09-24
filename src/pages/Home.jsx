@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import L from 'leaflet'
 import { useAuth } from '../contexts/AuthContext'
 import Button from '../components/ui/Button'
+import Flag from '../components/ui/Flag'
 
 const PIN_COLORS = ['#e53935', '#1e88e5', '#43a047']
 
@@ -79,12 +80,12 @@ function DashboardMockup() {
       </div>
       <div className="px-8 py-8">
         <h3 className="text-lg font-semibold tracking-tight text-[var(--color-ink)] mb-5">Your collections</h3>
-        <div className="grid grid-cols-2 gap-3">
-          <MockCard emoji={'\u{1F3F0}'} name="Europe" metas="2" visibility="Private" />
-          <MockCard emoji={'\u{1F310}'} name="Public" metas="157" visibility="Public" />
+        <div className="space-y-3">
+          <MockCard emoji={'\u{1F3F0}'} name="Europe" metas="2" visibility="Private" skill="Beginner" region="Estonia" regionCode="EE" />
+          <MockCard emoji={'\u{1F310}'} name="Public" metas="157" visibility="Public" skill="Advanced" region="World" regionCode="world" />
           <MockCard emoji={'\u{1F510}'} name="Top Secret" metas="19" visibility="Private" />
-          <div className="border border-dashed border-[var(--color-border)] rounded-lg p-4 flex flex-col items-center justify-center gap-1.5 text-[var(--color-ink-faint)] min-h-[68px]">
-            <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+          <div className="border border-dashed border-[var(--color-border)] rounded-lg p-4 flex items-center gap-3 text-[var(--color-ink-faint)]">
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="shrink-0">
               <line x1="10" y1="4" x2="10" y2="16" />
               <line x1="4" y1="10" x2="16" y2="10" />
             </svg>
@@ -139,7 +140,7 @@ function CollectionMockup() {
   )
 }
 
-function MockCard({ emoji, name, metas, visibility }) {
+function MockCard({ emoji, name, metas, visibility, skill, region, regionCode }) {
   const lockIcon = visibility === 'Private' ? (
     <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
@@ -153,9 +154,9 @@ function MockCard({ emoji, name, metas, visibility }) {
     </svg>
   )
   return (
-    <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg p-4 flex items-center">
+    <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg p-4 flex items-center gap-3">
       <span className="text-lg shrink-0">{emoji}</span>
-      <div className="flex-1 min-w-0 ml-3">
+      <div className="flex-1 min-w-0">
         <div className="text-xs font-medium text-[var(--color-ink)] truncate">{name}</div>
         <div className="text-[11px] text-[var(--color-ink-faint)] mt-0.5 flex items-center gap-1.5">
           <span>{metas} metas</span>
@@ -164,6 +165,21 @@ function MockCard({ emoji, name, metas, visibility }) {
             {visibility}
           </span>
         </div>
+        {(skill || region) && (
+          <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+            {skill && (
+              <span className="px-1.5 py-0.5 text-[9px] font-medium rounded bg-[var(--color-border)]/40 text-[var(--color-ink-muted)]">
+                {skill}
+              </span>
+            )}
+            {region && (
+              <span className="px-1.5 py-0.5 text-[9px] font-medium rounded bg-[var(--color-border)]/40 text-[var(--color-ink-muted)] inline-flex items-center gap-1">
+                <Flag code={regionCode || 'world'} size="text-[10px]" />
+                {region}
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )

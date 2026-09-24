@@ -26,3 +26,7 @@ export async function setUsername(uid, username, oldUsernameLower) {
   await setDoc(doc(db, 'users', uid), { username, usernameLower }, { merge: true })
   await setDoc(doc(db, 'usernames', usernameLower), { uid })
 }
+
+export async function setAvatarColor(uid, color) {
+  await setDoc(doc(db, 'users', uid), { avatarColor: color }, { merge: true })
+}

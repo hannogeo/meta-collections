@@ -3,7 +3,8 @@ import { useAuth } from '../../contexts/AuthContext'
 import { Link, useNavigate } from 'react-router-dom'
 import Button from '../ui/Button'
 import PasswordInput from './PasswordInput'
-import { setUsername } from '../../lib/users'
+import { setUsername, setAvatarColor } from '../../lib/users'
+import { randomAvatarColor } from '../../lib/avatar'
 
 export default function SignupForm() {
   const [email, setEmail] = useState('')
@@ -40,6 +41,7 @@ export default function SignupForm() {
     try {
       const cred = await signup(email, password)
       await setUsername(cred.user.uid, trimmedUsername)
+      await setAvatarColor(cred.user.uid, randomAvatarColor())
       navigate('/dashboard')
     } catch (err) {
       if (err.message === 'Username is already taken') {

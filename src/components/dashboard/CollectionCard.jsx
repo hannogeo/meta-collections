@@ -1,10 +1,21 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import EmojiPicker from './EmojiPicker'
+import Flag from '../ui/Flag'
+import { getRegion, WORLD } from '../../lib/regions'
+
+const SKILL_LABELS = {
+  beginner: 'Beginner',
+  intermediate: 'Intermediate',
+  advanced: 'Advanced',
+}
 
 export default function CollectionCard({ collection, username, onEdit, onDelete, onUpdateEmoji }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef(null)
+
+  const region = getRegion(collection.region)
+  const skill = collection.skillLevel ? SKILL_LABELS[collection.skillLevel] : null
 
   useEffect(() => {
     if (!menuOpen) return
@@ -18,7 +29,7 @@ export default function CollectionCard({ collection, username, onEdit, onDelete,
   }, [menuOpen])
 
   return (
-    <div className="group relative bg-[var(--color-surface-raised)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] rounded-lg p-4 transition-all flex items-center">
+    <div className="group relative bg-[var(--color-surface-raised)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] rounded-lg p-4 transition-all flex items-center gap-3">
       <Link
         to={`/${username}/${collection.name}`}
         className="absolute inset-0 rounded-lg z-0"
@@ -48,7 +59,7 @@ export default function CollectionCard({ collection, username, onEdit, onDelete,
           )}
         </div>
       </EmojiPicker>
-      <div className="flex-1 min-w-0 relative z-10 pl-3 pointer-events-none">
+      <div className="flex-1 min-w-0 relative z-10 pointer-events-none">
         <h3 className="text-sm font-medium text-[var(--color-ink)] truncate">
           {collection.name}
         </h3>
@@ -74,6 +85,21 @@ export default function CollectionCard({ collection, username, onEdit, onDelete,
             </span>
           )}
         </p>
+        {(skill || region) && (
+          <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+            {skill && (
+              <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-[var(--color-border)]/40 text-[var(--color-ink-muted)]">
+                {skill}
+              </span>
+            )}
+            {region && (
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded bg-[var(--color-border)]/40 text-[var(--color-ink-muted)]">
+                <Flag code={region.code} size="text-[11px]" />
+                {region.code === WORLD.code ? region.name : region.name}
+              </span>
+            )}
+          </div>
+        )}
       </div>
       <div className="relative shrink-0 z-10" ref={menuRef}>
         <button

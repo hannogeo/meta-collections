@@ -128,3 +128,23 @@ input, textarea, select {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+@keyframes menu-pop-in {
+  from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes menu-pop-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(-4px) scale(0.98); }
+}
+
+.animate-menu-pop-in {
+  animation: menu-pop-in 0.15s ease-out;
+  transform-origin: top right;
+}
+
+.animate-menu-pop-out {
+  animation: menu-pop-out 0.12s ease-in forwards;
+  transform-origin: top right;
+}
