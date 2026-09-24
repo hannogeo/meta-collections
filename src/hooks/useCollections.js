@@ -19,6 +19,12 @@ import { getUserUid } from '../lib/users'
 const MAX_COLLECTIONS = 5
 const MAX_METAS = 1000
 
+function requirePublicDetails(visibility, skillLevel, region) {
+  if (visibility === 'public' && (!skillLevel || !region)) {
+    throw new Error('Public collections need a skill level and a region')
+  }
+}
+
 export function useCollections(userId) {
   const [collections, setCollections] = useState([])
   const [trashCollections, setTrashCollections] = useState([])
@@ -62,7 +68,7 @@ export function useCollections(userId) {
     )
   }
 
-  async function createCollection(name, emoji, visibility = 'private') {
+  async function createCollection(name, emoji, visibility = 'private', skillLevel = null, region = null) {
     const activeCount = collections.length
     if (activeCount >= MAX_COLLECTIONS) {
       throw new Error(`Maximum of ${MAX_COLLECTIONS} collections reached`)
@@ -70,11 +76,14 @@ export function useCollections(userId) {
     if (isNameTaken(name)) {
       throw new Error('A collection with this name already exists')
     }
+    requirePublicDetails(visibility, skillLevel, region)
 
     const docRef = await addDoc(collection(db, 'users', userId, 'collections'), {
       name,
       emoji: emoji || null,
       visibility,
+      skillLevel: skillLevel || null,
+      region: region || null,
       createdAt: serverTimestamp(),
       metaCount: 0,
       deletedAt: null,
@@ -83,11 +92,16 @@ export function useCollections(userId) {
     return docRef.id
   }
 
-  async function renameCollection(collectionId, newName, emoji, visibility) {
+  async function renameCollection(collectionId, newName, emoji, visibility, skillLevel = null, region = null) {
     if (isNameTaken(newName, collectionId)) {
       throw new Error('A collection with this name already exists')
     }
-    const updates = { name: newName }
+    requirePublicDetails(visibility, skillLevel, region)
+    const updates = {
+      name: newName,
+      skillLevel: skillLevel || null,
+      region: region || null,
+    }
     if (emoji !== undefined) updates.emoji = emoji || null
     if (visibility !== undefined) updates.visibility = visibility
     await updateDoc(doc(db, 'users', userId, 'collections', collectionId), updates)

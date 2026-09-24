@@ -5,6 +5,7 @@ import { useParams, useNavigate, Navigate } from 'react-router-dom'
 import MetaCard from '../components/collection/MetaCard'
 import MetaFormModal from '../components/collection/MetaFormModal'
 import EmojiPicker from '../components/dashboard/EmojiPicker'
+import CollectionSettings from '../components/dashboard/CollectionSettings'
 import Button from '../components/ui/Button'
 import Modal from '../components/ui/Modal'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
@@ -24,6 +25,8 @@ export default function Collection() {
   const [renameEmoji, setRenameEmoji] = useState('')
   const [renameVisibility, setRenameVisibility] = useState('private')
   const [renameError, setRenameError] = useState('')
+  const [renameSkillLevel, setRenameSkillLevel] = useState(null)
+  const [renameRegion, setRenameRegion] = useState(null)
   const [publicCollection, setPublicCollection] = useState(null)
   const [search, setSearch] = useState('')
   const navigate = useNavigate()
@@ -131,6 +134,8 @@ export default function Collection() {
     setRenameValue(collection.name)
     setRenameEmoji(collection.emoji || '')
     setRenameVisibility(collection.visibility || 'private')
+    setRenameSkillLevel(collection.skillLevel || null)
+    setRenameRegion(collection.region || null)
     setRenameError('')
     setShowRename(true)
   }
@@ -139,7 +144,7 @@ export default function Collection() {
     e.preventDefault()
     if (!renameValue.trim()) return
     try {
-      await renameCollection(collectionId, renameValue.trim(), renameEmoji, renameVisibility)
+      await renameCollection(collectionId, renameValue.trim(), renameEmoji, renameVisibility, renameSkillLevel, renameRegion)
       setShowRename(false)
       navigate(`/${username}/${renameValue.trim()}`, { replace: true })
     } catch (err) {
@@ -345,6 +350,13 @@ export default function Collection() {
                 autoFocus
                 className="w-full px-3 py-2 text-sm bg-transparent border border-[var(--color-border)] rounded-md text-[var(--color-ink)] placeholder:text-[var(--color-ink-faint)] focus:outline-none focus:border-[var(--color-ink)] transition-colors"
               />
+              <CollectionSettings
+                skillLevel={renameSkillLevel}
+                onSkillLevelChange={setRenameSkillLevel}
+                region={renameRegion}
+                onRegionChange={setRenameRegion}
+                required={renameVisibility === 'public'}
+              />
               <div>
                 <label className="block text-xs font-medium text-[var(--color-ink-muted)] mb-2 uppercase tracking-wider">
                   Visibility
@@ -389,7 +401,7 @@ export default function Collection() {
               </div>
               <Button
                 type="submit"
-                disabled={!renameValue.trim() || (renameValue.trim() === collection.name && renameEmoji === (collection.emoji || '') && renameVisibility === (collection.visibility || 'private'))}
+                disabled={!renameValue.trim() || (renameValue.trim() === collection.name && renameEmoji === (collection.emoji || '') && renameVisibility === (collection.visibility || 'private') && renameSkillLevel === (collection.skillLevel || null) && renameRegion === (collection.region || null)) || (renameVisibility === 'public' && (!renameSkillLevel || !renameRegion))}
                 className="w-full"
               >
                 Save

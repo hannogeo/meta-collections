@@ -2,24 +2,32 @@ import { useState } from 'react'
 import Modal from '../ui/Modal'
 import Button from '../ui/Button'
 import EmojiPicker from './EmojiPicker'
+import CollectionSettings from './CollectionSettings'
 
 export default function CreateCollectionModal({ open, onClose, onCreate, maxReached }) {
   const [name, setName] = useState('')
   const [emoji, setEmoji] = useState('')
   const [visibility, setVisibility] = useState('private')
+  const [skillLevel, setSkillLevel] = useState(null)
+  const [region, setRegion] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  const required = visibility === 'public'
+  const missingRequired = required && (!skillLevel || !region)
+
   async function handleSubmit(e) {
     e.preventDefault()
-    if (!name.trim()) return
+    if (!name.trim() || missingRequired) return
     setLoading(true)
     setError('')
     try {
-      await onCreate(name.trim(), emoji, visibility)
+      await onCreate(name.trim(), emoji, visibility, skillLevel, region)
       setName('')
       setEmoji('')
       setVisibility('private')
+      setSkillLevel(null)
+      setRegion(null)
       onClose()
     } catch (err) {
       setError(err.message)
@@ -31,6 +39,8 @@ export default function CreateCollectionModal({ open, onClose, onCreate, maxReac
     setName('')
     setEmoji('')
     setVisibility('private')
+    setSkillLevel(null)
+    setRegion(null)
     setError('')
     onClose()
   }
@@ -75,6 +85,13 @@ export default function CreateCollectionModal({ open, onClose, onCreate, maxReac
               />
             </div>
           </div>
+          <CollectionSettings
+            skillLevel={skillLevel}
+            onSkillLevelChange={setSkillLevel}
+            region={region}
+            onRegionChange={setRegion}
+            required={required}
+          />
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-xs font-medium text-[var(--color-ink-muted)] uppercase tracking-wider">
@@ -119,7 +136,7 @@ export default function CreateCollectionModal({ open, onClose, onCreate, maxReac
               </button>
             </div>
           </div>
-          <Button type="submit" disabled={loading || !name.trim()} className="w-full">
+          <Button type="submit" disabled={loading || !name.trim() || missingRequired} className="w-full">
             {loading ? 'Creating...' : 'Create'}
           </Button>
         </form>

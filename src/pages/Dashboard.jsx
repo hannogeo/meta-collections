@@ -9,6 +9,7 @@ import ConfirmDialog from '../components/ui/ConfirmDialog'
 import Modal from '../components/ui/Modal'
 import Button from '../components/ui/Button'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
+import CollectionSettings from '../components/dashboard/CollectionSettings'
 
 export default function Dashboard() {
   const { user, userProfile, loading: authLoading } = useAuth()
@@ -18,6 +19,8 @@ export default function Dashboard() {
   const [editValue, setEditValue] = useState('')
   const [editEmoji, setEditEmoji] = useState('')
   const [editVisibility, setEditVisibility] = useState('private')
+  const [editSkillLevel, setEditSkillLevel] = useState(null)
+  const [editRegion, setEditRegion] = useState(null)
   const [editError, setEditError] = useState('')
   const [deleteTarget, setDeleteTarget] = useState(null)
 
@@ -31,6 +34,8 @@ export default function Dashboard() {
     setEditValue(col.name)
     setEditEmoji(col.emoji || '')
     setEditVisibility(col.visibility || 'private')
+    setEditSkillLevel(col.skillLevel || null)
+    setEditRegion(col.region || null)
     setEditError('')
   }
 
@@ -38,11 +43,13 @@ export default function Dashboard() {
     e.preventDefault()
     if (!editValue.trim() || !editTarget) return
     try {
-      await renameCollection(editTarget.id, editValue.trim(), editEmoji, editVisibility)
+      await renameCollection(editTarget.id, editValue.trim(), editEmoji, editVisibility, editSkillLevel, editRegion)
       setEditTarget(null)
       setEditValue('')
       setEditEmoji('')
       setEditVisibility('private')
+      setEditSkillLevel(null)
+      setEditRegion(null)
       setEditError('')
     } catch (err) {
       setEditError(err.message)
@@ -60,7 +67,11 @@ export default function Dashboard() {
   const editDisabled = !editValue.trim() || (
     editValue.trim() === editTarget?.name &&
     editEmoji === (editTarget?.emoji || '') &&
-    editVisibility === (editTarget?.visibility || 'private')
+    editVisibility === (editTarget?.visibility || 'private') &&
+    editSkillLevel === (editTarget?.skillLevel || null) &&
+    editRegion === (editTarget?.region || null)
+  ) || (
+    editVisibility === 'public' && (!editSkillLevel || !editRegion)
   )
 
   return (
@@ -164,6 +175,13 @@ export default function Dashboard() {
             onChange={(e) => setEditValue(e.target.value)}
             autoFocus
             className="w-full px-3 py-2 text-sm bg-transparent border border-[var(--color-border)] rounded-md text-[var(--color-ink)] placeholder:text-[var(--color-ink-faint)] focus:outline-none focus:border-[var(--color-ink)] transition-colors"
+          />
+          <CollectionSettings
+            skillLevel={editSkillLevel}
+            onSkillLevelChange={setEditSkillLevel}
+            region={editRegion}
+            onRegionChange={setEditRegion}
+            required={editVisibility === 'public'}
           />
           <div>
             <label className="block text-xs font-medium text-[var(--color-ink-muted)] mb-2 uppercase tracking-wider">
