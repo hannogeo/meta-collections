@@ -1,13 +1,16 @@
-import { useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { Navigate } from 'react-router-dom'
 import LoginForm from '../components/auth/LoginForm'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
+import { usePageMeta } from '../lib/seo'
 
 export default function Login() {
   const { user, loading } = useAuth()
 
-  useEffect(() => { document.title = 'Log in | Meta Collections' }, [])
+  usePageMeta({
+    title: 'Log in | Meta Collections',
+    description: 'Log in to your Meta Collections account to manage your GeoGuessr metas.',
+  })
 
   if (loading) return <LoadingSpinner />
   if (user) return <Navigate to="/dashboard" />

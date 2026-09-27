@@ -1,9 +1,13 @@
-import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Button from '../components/ui/Button'
+import { usePageMeta } from '../lib/seo'
 
 export default function NotFound() {
-  useEffect(() => { document.title = 'Page not found | Meta Collections' }, [])
+  usePageMeta({
+    title: 'Page not found | Meta Collections',
+    description: 'The page you are looking for does not exist.',
+    noindex: true,
+  })
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">

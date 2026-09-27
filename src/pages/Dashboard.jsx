@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useCollections } from '../hooks/useCollections'
 import { Navigate, Link } from 'react-router-dom'
@@ -11,6 +11,8 @@ import Button from '../components/ui/Button'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import CollectionSettings from '../components/dashboard/CollectionSettings'
 import AvatarMenu from '../components/ui/AvatarMenu'
+import Logo from '../components/ui/Logo'
+import { usePageMeta } from '../lib/seo'
 
 export default function Dashboard() {
   const { user, userProfile, loading: authLoading } = useAuth()
@@ -25,7 +27,11 @@ export default function Dashboard() {
   const [editError, setEditError] = useState('')
   const [deleteTarget, setDeleteTarget] = useState(null)
 
-  useEffect(() => { document.title = 'Dashboard | Meta Collections' }, [])
+  usePageMeta({
+    title: 'Dashboard | Meta Collections',
+    description: 'Manage your GeoGuessr meta collections on your dashboard.',
+    noindex: true,
+  })
 
   if (authLoading) return <LoadingSpinner />
   if (!user) return <Navigate to="/login" />
@@ -79,7 +85,8 @@ export default function Dashboard() {
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 bg-[var(--color-surface)]/80 backdrop-blur-md border-b border-[var(--color-border)]">
         <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
-          <Link to="/dashboard" className="text-sm font-semibold tracking-tight text-[var(--color-ink)]">
+          <Link to="/dashboard" className="flex items-center gap-2 text-sm font-semibold tracking-tight text-[var(--color-ink)]">
+            <Logo />
             Meta Collections
           </Link>
           <div className="flex items-center gap-4">

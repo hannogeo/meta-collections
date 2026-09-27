@@ -9,6 +9,8 @@ import CollectionSettings from '../components/dashboard/CollectionSettings'
 import Button from '../components/ui/Button'
 import Modal from '../components/ui/Modal'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
+import { usePageMeta } from '../lib/seo'
+import { getRegion } from '../lib/regions'
 
 export default function Collection() {
   const { username, collectionName } = useParams()
@@ -40,12 +42,14 @@ export default function Collection() {
 
   const isViewOnly = !user || (user && !collection)
 
-  useEffect(() => {
-    if (collection?.name) {
-      document.title = `${collection.name} | Meta Collections`
-    }
-    return () => { document.title = 'Meta Collections' }
-  }, [collection?.name])
+  const region = collection?.region ? getRegion(collection.region) : null
+  usePageMeta({
+    title: collection ? `${collection.name} | Meta Collections` : 'Meta Collections',
+    description: collection
+      ? `${username}'s ${collection.name} collection - GeoGuessr metas${region ? ` for ${region.name}` : ''}${collection.skillLevel ? ` (${collection.skillLevel})` : ''}.`
+      : 'View this Meta Collections collection.',
+    noindex: isViewOnly && user,
+  })
 
   useEffect(() => {
     if (authLoading) return

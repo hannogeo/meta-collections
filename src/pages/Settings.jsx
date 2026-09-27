@@ -10,6 +10,7 @@ import AvatarMenu from '../components/ui/AvatarMenu'
 import ColorPicker from '../components/ui/ColorPicker'
 import { setUsername, setAvatarColor } from '../lib/users'
 import { avatarColorFromUsername } from '../lib/avatar'
+import { usePageMeta } from '../lib/seo'
 
 const themes = [
   { value: 'system', label: 'System', description: 'Follow your device settings' },
@@ -36,7 +37,11 @@ export default function Settings() {
   const [hasProfile, setHasProfile] = useState(null)
   const [showLogout, setShowLogout] = useState(false)
 
-  useEffect(() => { document.title = 'Settings | Meta Collections' }, [])
+  usePageMeta({
+    title: 'Settings | Meta Collections',
+    description: 'Manage your Meta Collections profile, appearance, and account settings.',
+    noindex: true,
+  })
 
   useEffect(() => {
     if (userProfile !== undefined) {

@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useCollections } from '../hooks/useCollections'
 import { Navigate, Link } from 'react-router-dom'
 import Button from '../components/ui/Button'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
+import { usePageMeta } from '../lib/seo'
 
 function daysRemaining(deletedAt) {
   if (!deletedAt?.toDate) return 7
@@ -21,7 +22,11 @@ export default function Trash() {
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [showEmptyTrash, setShowEmptyTrash] = useState(false)
 
-  useEffect(() => { document.title = 'Trash | Meta Collections' }, [])
+  usePageMeta({
+    title: 'Trash | Meta Collections',
+    description: 'Restore or permanently delete collections from your Meta Collections trash.',
+    noindex: true,
+  })
 
   if (authLoading) return <LoadingSpinner />
   if (!user) return <Navigate to="/login" />

@@ -5,6 +5,7 @@ import L from 'leaflet'
 import { useAuth } from '../contexts/AuthContext'
 import Button from '../components/ui/Button'
 import Flag from '../components/ui/Flag'
+import { usePageMeta } from '../lib/seo'
 
 const PIN_COLORS = ['#e53935', '#1e88e5', '#43a047']
 
@@ -258,7 +259,10 @@ function Feature({ icon, title, description }) {
 export default function Home() {
   const { user } = useAuth()
 
-  useEffect(() => { document.title = 'Meta Collections' }, [])
+  usePageMeta({
+    title: 'Meta Collections - GeoGuessr metas, in one place',
+    description: 'Store your GeoGuessr metas in one place - organize tips and tricks by region and skill level, search them, and reference them while you play.',
+  })
 
   if (user) return <Navigate to="/dashboard" replace />
 
