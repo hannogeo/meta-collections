@@ -86,6 +86,7 @@ export function useCollections(userId) {
       region: region || null,
       createdAt: serverTimestamp(),
       metaCount: 0,
+      saveCount: 0,
       deletedAt: null,
     })
 

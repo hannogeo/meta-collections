@@ -29,7 +29,14 @@ export default function SavedCollectionCard({ saved, onUnsave }) {
         <p className="text-xs text-[var(--color-ink-faint)] mt-0.5 tabular-nums flex items-center gap-1.5">
           <span>{saved.metaCount || 0} {saved.metaCount === 1 ? 'meta' : 'metas'}</span>
           <span className="inline-flex items-center gap-0.5 text-[var(--color-ink-faint)]">
-            by <span className="text-[var(--color-ink-muted)]">{saved.ownerUsername}</span>
+            by{' '}
+            <Link
+              to={`/${saved.ownerUsername}`}
+              onClick={(e) => e.stopPropagation()}
+              className="pointer-events-auto text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] hover:underline underline-offset-2 transition-colors"
+            >
+              {saved.ownerUsername}
+            </Link>
           </span>
         </p>
         {(skill || region) && (

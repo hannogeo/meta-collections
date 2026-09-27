@@ -76,6 +76,15 @@ export default function AvatarMenu({ size = 30 }) {
             <button
               onClick={() => {
                 closeMenu()
+                navigate(`/${username}`)
+              }}
+              className="w-full text-left px-3 py-2 text-sm text-[var(--color-ink)] hover:bg-[var(--color-border)]/30 transition-colors cursor-pointer"
+            >
+              Profile
+            </button>
+            <button
+              onClick={() => {
+                closeMenu()
                 navigate('/settings')
               }}
               className="w-full text-left px-3 py-2 text-sm text-[var(--color-ink)] hover:bg-[var(--color-border)]/30 transition-colors cursor-pointer"

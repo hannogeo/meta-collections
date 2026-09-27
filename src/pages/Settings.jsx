@@ -8,7 +8,7 @@ import ConfirmDialog from '../components/ui/ConfirmDialog'
 import Avatar from '../components/ui/Avatar'
 import AvatarMenu from '../components/ui/AvatarMenu'
 import ColorPicker from '../components/ui/ColorPicker'
-import { setUsername, setAvatarColor } from '../lib/users'
+import { setUsername, setAvatarColor, setProfileVisibility } from '../lib/users'
 import { avatarColorFromUsername } from '../lib/avatar'
 import { usePageMeta } from '../lib/seo'
 
@@ -31,6 +31,7 @@ export default function Settings() {
   const [activeSection, setActiveSection] = useState('profile')
   const [usernameValue, setUsernameValue] = useState('')
   const [avatarColor, setAvatarColorValue] = useState('')
+  const [visibilityValue, setVisibilityValue] = useState('public')
   const [profileError, setProfileError] = useState('')
   const [profileSuccess, setProfileSuccess] = useState('')
   const [savingProfile, setSavingProfile] = useState(false)
@@ -49,12 +50,13 @@ export default function Settings() {
       if (userProfile?.username) {
         setUsernameValue(userProfile.username)
       }
+      setVisibilityValue(userProfile?.profileVisibility || 'public')
     }
   }, [userProfile])
 
   const originalUsername = userProfile?.username || ''
   const originalColor = userProfile?.avatarColor || avatarColorFromUsername(userProfile?.username || '')
-  const profileChanged = usernameValue.trim() !== originalUsername || avatarColor !== originalColor
+  const profileChanged = usernameValue.trim() !== originalUsername || avatarColor !== originalColor || visibilityValue !== (userProfile?.profileVisibility || 'public')
 
   useEffect(() => {
     setAvatarColorValue(originalColor)
@@ -95,7 +97,10 @@ export default function Settings() {
       if (avatarColor !== userProfile?.avatarColor) {
         await setAvatarColor(user.uid, avatarColor)
       }
-      setUserProfile({ ...userProfile, username: trimmed, usernameLower: trimmed.toLowerCase(), avatarColor })
+      if (visibilityValue !== (userProfile?.profileVisibility || 'public')) {
+        await setProfileVisibility(user.uid, visibilityValue)
+      }
+      setUserProfile({ ...userProfile, username: trimmed, usernameLower: trimmed.toLowerCase(), avatarColor, profileVisibility: visibilityValue })
       setProfileSuccess('Saved')
       setTimeout(() => setProfileSuccess(''), 2000)
     } catch (err) {
@@ -180,6 +185,33 @@ export default function Settings() {
                       <ColorPicker value={avatarColor} onChange={setAvatarColorValue} />
                     </div>
                   </div>
+                </section>
+
+                <section className="mb-10">
+                  <h3 className="text-sm font-medium text-[var(--color-ink)] mb-3">Profile visibility</h3>
+                  <div className="inline-flex rounded-lg border border-[var(--color-border)] overflow-hidden">
+                    {[
+                      { value: 'public', label: 'Public', description: 'Anyone can view your profile' },
+                      { value: 'private', label: 'Private', description: 'Only you can view your profile' },
+                    ].map((v) => (
+                      <button
+                        key={v.value}
+                        onClick={() => setVisibilityValue(v.value)}
+                        className={`px-4 py-2 text-sm transition-colors cursor-pointer ${
+                          visibilityValue === v.value
+                            ? 'bg-[var(--color-surface-raised)] text-[var(--color-ink)] font-medium'
+                            : 'text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] hover:bg-[var(--color-border)]/30'
+                        }`}
+                      >
+                        {v.label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-[var(--color-ink-faint)] mt-2">
+                    {visibilityValue === 'private'
+                      ? 'Your profile page will be hidden, but your public collections stay public.'
+                      : 'Your profile page is visible to everyone.'}
+                  </p>
                 </section>
 
                 <section className="pt-6 border-t border-[var(--color-border)]">

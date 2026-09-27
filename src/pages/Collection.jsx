@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useCollections, resolveCollectionPath, loadPublicMetas } from '../hooks/useCollections'
-import { useParams, useNavigate, Navigate } from 'react-router-dom'
+import { useParams, useNavigate, Navigate, Link } from 'react-router-dom'
 import MetaCard from '../components/collection/MetaCard'
 import MetaFormModal from '../components/collection/MetaFormModal'
 import EmojiPicker from '../components/dashboard/EmojiPicker'
@@ -307,7 +307,11 @@ export default function Collection() {
         {user && !canEdit && (
           <div className="mb-8 px-4 py-3 bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg flex items-center justify-between gap-4">
             <p className="text-sm text-[var(--color-ink-muted)]">
-              This is a public collection by <span className="text-[var(--color-ink)] font-medium">{username}</span>. Read-only.
+              This is a public collection by{' '}
+              <Link to={`/${username}`} className="text-[var(--color-ink)] font-medium hover:underline underline-offset-2 transition-colors">
+                {username}
+              </Link>
+              . Read-only.
             </p>
             <div className="flex items-center gap-3 shrink-0">
               {saveError && (

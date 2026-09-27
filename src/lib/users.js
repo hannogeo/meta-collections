@@ -11,6 +11,19 @@ export async function getUserUid(usernameLower) {
   return snap.exists() ? snap.data().uid : null
 }
 
+export async function getUserByUsername(username) {
+  const lower = (username || '').toLowerCase()
+  const uid = await getUserUid(lower)
+  if (!uid) return null
+  const profile = await getUserProfile(uid)
+  if (!profile) return null
+  return { uid, ...profile }
+}
+
+export async function setProfileVisibility(uid, visibility) {
+  await setDoc(doc(db, 'users', uid), { profileVisibility: visibility }, { merge: true })
+}
+
 export async function setUsername(uid, username, oldUsernameLower) {
   const usernameLower = username.toLowerCase()
 
