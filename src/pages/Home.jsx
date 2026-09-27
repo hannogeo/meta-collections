@@ -5,6 +5,7 @@ import L from 'leaflet'
 import { useAuth } from '../contexts/AuthContext'
 import Button from '../components/ui/Button'
 import Flag from '../components/ui/Flag'
+import Logo from '../components/ui/Logo'
 import { usePageMeta } from '../lib/seo'
 
 const PIN_COLORS = ['#e53935', '#1e88e5', '#43a047']
@@ -93,11 +94,11 @@ function DashboardMockup() {
             <span className="text-[11px] font-medium">New collection</span>
           </div>
         </div>
-        <h3 className="text-sm font-semibold tracking-tight text-[var(--color-ink)] mt-8 mb-3">Saved collections</h3>
-        <div className="space-y-3">
-          <MockCard emoji={'\u{1F5FA}'} name="World" metas="83" skill="Intermediate" region="World" regionCode="world" by="geo-friends" />
-          <MockCard emoji={'\u{1F1FA}\u{1F1F8}'} name="USA" metas="41" skill="Beginner" region="United States" regionCode="US" by="roadtripper" />
-        </div>
+<h3 className="text-sm font-semibold tracking-tight text-[var(--color-ink)] mt-8 mb-3">Saved collections</h3>
+          <div className="space-y-3">
+            <MockCard emoji={'\u{1F5FA}'} name="World" metas="83" skill="Intermediate" region="World" regionCode="world" by="pandazan_" />
+            <MockCard emoji={'\u{1F3DD}'} name="Islands" metas="41" skill="Beginner" region="Greece" regionCode="GR" by="vikoisdumb" />
+          </div>
       </div>
     </div>
   )
@@ -256,6 +257,15 @@ function ShareIcon() {
   )
 }
 
+function CompassIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+    </svg>
+  )
+}
+
 function Feature({ icon, title, description }) {
   return (
     <div>
@@ -282,7 +292,10 @@ export default function Home() {
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 bg-[var(--color-surface)]/80 backdrop-blur-md border-b border-[var(--color-border)]">
         <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-          <span className="text-sm font-semibold tracking-tight text-[var(--color-ink)]">Meta Collections</span>
+          <span className="flex items-center gap-2 text-sm font-semibold tracking-tight text-[var(--color-ink)]">
+            <Logo />
+            Meta Collections
+          </span>
           <div className="flex items-center gap-3">
             <Link to="/login" className="text-sm text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors">
               Log in
@@ -314,6 +327,28 @@ export default function Home() {
               </Link>
             </div>
           </div>
+        </section>
+
+        <section className="max-w-5xl mx-auto px-6 pb-24">
+          <Link
+            to="/discover"
+            className="group flex items-center justify-between gap-4 w-full bg-[var(--color-surface-raised)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] rounded-xl px-6 py-5 transition-all"
+          >
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="w-10 h-10 rounded-lg bg-[var(--color-ink)] text-[var(--color-surface)] flex items-center justify-center shrink-0">
+                <CompassIcon />
+              </div>
+              <div className="min-w-0">
+                <h3 className="text-sm font-medium text-[var(--color-ink)]">Browse public collections</h3>
+                <p className="text-sm text-[var(--color-ink-muted)] truncate">
+                  No account needed - check out the most saved metas right away.
+                </p>
+              </div>
+            </div>
+            <span className="text-sm text-[var(--color-ink-muted)] group-hover:text-[var(--color-ink)] transition-colors shrink-0">
+              Discover &rarr;
+            </span>
+          </Link>
         </section>
 
         <section className="max-w-5xl mx-auto px-6 pb-24">

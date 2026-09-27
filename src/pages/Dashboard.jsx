@@ -13,6 +13,7 @@ import LoadingSpinner from '../components/ui/LoadingSpinner'
 import CollectionSettings from '../components/dashboard/CollectionSettings'
 import AvatarMenu from '../components/ui/AvatarMenu'
 import Logo from '../components/ui/Logo'
+import AppNav from '../components/ui/AppNav'
 import { usePageMeta } from '../lib/seo'
 import { useSavedCollections } from '../hooks/useSavedCollections'
 
@@ -100,6 +101,7 @@ export default function Dashboard() {
             Meta Collections
           </Link>
           <div className="flex items-center gap-4">
+            <AppNav current="dashboard" />
             <AvatarMenu />
           </div>
         </div>
