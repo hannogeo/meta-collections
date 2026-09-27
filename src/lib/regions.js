@@ -1,4 +1,4 @@
-export const WORLD = { code: 'world', name: 'Entire world' }
+export const WORLD = { code: 'world', name: 'World' }
 
 export const COUNTRIES = [
   { code: 'AF', name: 'Afghanistan' },

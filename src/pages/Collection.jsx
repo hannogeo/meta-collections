@@ -11,11 +11,13 @@ import Modal from '../components/ui/Modal'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import { usePageMeta } from '../lib/seo'
 import { getRegion } from '../lib/regions'
+import { useSavedCollections } from '../hooks/useSavedCollections'
 
 export default function Collection() {
   const { username, collectionName } = useParams()
-  const { user, loading: authLoading } = useAuth()
+  const { user, userProfile, loading: authLoading } = useAuth()
   const { getMetas, addMeta, updateMeta, deleteMeta, updateEmoji, renameCollection, collections: ownerCollections, loading: collectionsLoading, loaded: collectionsLoaded, MAX_METAS } = useCollections(user?.uid)
+  const { isSaved, saveCollection, unsaveCollection } = useSavedCollections(user?.uid)
 
   const [metas, setMetas] = useState([])
   const [metasLoading, setMetasLoading] = useState(true)
@@ -31,13 +33,21 @@ export default function Collection() {
   const [renameRegion, setRenameRegion] = useState(null)
   const [publicCollection, setPublicCollection] = useState(null)
   const [search, setSearch] = useState('')
+  const [saveError, setSaveError] = useState('')
+  const [saving, setSaving] = useState(false)
   const navigate = useNavigate()
   const bottomRef = useRef(null)
   const publicLoadAttempted = useRef(false)
 
-  const ownerMatch = ownerCollections?.find(
-    (c) => c.name.toLowerCase() === collectionName?.toLowerCase()
-  )
+  const ownerUsername = userProfile?.username?.toLowerCase()
+  const urlUsername = username?.toLowerCase()
+  const isOwnProfile = !!user && !!ownerUsername && urlUsername === ownerUsername
+
+  const ownerMatch = isOwnProfile
+    ? (ownerCollections?.find(
+        (c) => c.name.toLowerCase() === collectionName?.toLowerCase()
+      ) || null)
+    : null
   const collection = ownerMatch || publicCollection
 
   const isViewOnly = !user || (user && !collection)
@@ -53,8 +63,17 @@ export default function Collection() {
 
   useEffect(() => {
     if (authLoading) return
+    if (user && !userProfile) return
 
-    if (user && collectionsLoaded) {
+    if (user && !isOwnProfile) {
+      if (!publicLoadAttempted.current) {
+        publicLoadAttempted.current = true
+        loadPublic()
+      }
+      return
+    }
+
+    if (user && isOwnProfile && collectionsLoaded) {
       const found = ownerCollections.find(
         (c) => c.name.toLowerCase() === collectionName?.toLowerCase()
       )
@@ -85,7 +104,7 @@ export default function Collection() {
       publicLoadAttempted.current = true
       loadPublic()
     }
-  }, [user, authLoading, collectionsLoaded, ownerCollections, collectionName])
+  }, [user, authLoading, collectionsLoaded, ownerCollections, collectionName, isOwnProfile])
 
   async function loadPublic() {
     try {
@@ -112,6 +131,25 @@ export default function Collection() {
 
   const collectionId = collection.collectionId || collection.id
   const ownerId = collection.uid
+
+  async function handleSaveToggle() {
+    setSaveError('')
+    if (isSaved(ownerId, collectionId)) {
+      try {
+        await unsaveCollection(ownerId, collectionId)
+      } catch {
+        setSaveError('Could not remove from saved collections.')
+      }
+      return
+    }
+    setSaving(true)
+    try {
+      await saveCollection({ ownerUid: ownerId, ownerUsername: username, collectionId, collection })
+    } catch {
+      setSaveError('Could not save this collection. Please try again.')
+    }
+    setSaving(false)
+  }
 
   async function handleAdd(data) {
     await addMeta(collectionId, data)
@@ -267,10 +305,36 @@ export default function Collection() {
           </div>
         )}
         {user && !canEdit && (
-          <div className="mb-8 px-4 py-3 bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg">
+          <div className="mb-8 px-4 py-3 bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg flex items-center justify-between gap-4">
             <p className="text-sm text-[var(--color-ink-muted)]">
               This is a public collection by <span className="text-[var(--color-ink)] font-medium">{username}</span>. Read-only.
             </p>
+            <div className="flex items-center gap-3 shrink-0">
+              {saveError && (
+                <span className="text-xs text-[var(--color-danger)]">{saveError}</span>
+              )}
+              <button
+                onClick={handleSaveToggle}
+                disabled={saving}
+                className="text-xs font-medium rounded-md px-3 py-1.5 transition-colors cursor-pointer shrink-0 border border-[var(--color-border)] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] hover:border-[var(--color-border-hover)] disabled:opacity-50 disabled:cursor-wait"
+              >
+              {isSaved(ownerId, collectionId) ? (
+                <span className="flex items-center gap-1.5">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                  </svg>
+                  Saved
+                </span>
+              ) : (
+                <span className="flex items-center gap-1.5">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                  </svg>
+                  Save
+                </span>
+              )}
+            </button>
+            </div>
           </div>
         )}
 

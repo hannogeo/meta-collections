@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useCollections } from '../hooks/useCollections'
 import { Navigate, Link } from 'react-router-dom'
 import CollectionCard from '../components/dashboard/CollectionCard'
+import SavedCollectionCard from '../components/dashboard/SavedCollectionCard'
 import CreateCollectionModal from '../components/dashboard/CreateCollectionModal'
 import EmojiPicker from '../components/dashboard/EmojiPicker'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
@@ -13,10 +14,12 @@ import CollectionSettings from '../components/dashboard/CollectionSettings'
 import AvatarMenu from '../components/ui/AvatarMenu'
 import Logo from '../components/ui/Logo'
 import { usePageMeta } from '../lib/seo'
+import { useSavedCollections } from '../hooks/useSavedCollections'
 
 export default function Dashboard() {
   const { user, userProfile, loading: authLoading } = useAuth()
   const { collections, loading, createCollection, renameCollection, updateEmoji, softDeleteCollection, MAX_COLLECTIONS } = useCollections(user?.uid)
+  const { savedCollections, unsaveCollection } = useSavedCollections(user?.uid)
   const [showCreate, setShowCreate] = useState(false)
   const [editTarget, setEditTarget] = useState(null)
   const [editValue, setEditValue] = useState('')
@@ -26,6 +29,7 @@ export default function Dashboard() {
   const [editRegion, setEditRegion] = useState(null)
   const [editError, setEditError] = useState('')
   const [deleteTarget, setDeleteTarget] = useState(null)
+  const [unsaveTarget, setUnsaveTarget] = useState(null)
 
   usePageMeta({
     title: 'Dashboard | Meta Collections',
@@ -67,6 +71,12 @@ export default function Dashboard() {
     if (!deleteTarget) return
     await softDeleteCollection(deleteTarget.id)
     setDeleteTarget(null)
+  }
+
+  async function handleUnsave() {
+    if (!unsaveTarget) return
+    await unsaveCollection(unsaveTarget.ownerUid, unsaveTarget.collectionId)
+    setUnsaveTarget(null)
   }
 
   const totalMetas = collections.reduce((sum, c) => sum + (c.metaCount || 0), 0)
@@ -152,6 +162,26 @@ export default function Dashboard() {
                 <span className="text-sm font-medium">New collection</span>
               </button>
             )}
+          </div>
+        )}
+
+        {savedCollections.length > 0 && (
+          <div className="mt-12">
+            <h2 className="text-base font-semibold tracking-tight text-[var(--color-ink)]">
+              Saved collections
+            </h2>
+            <p className="text-sm text-[var(--color-ink-faint)] mt-1 mb-4">
+              Public collections you've saved from others.
+            </p>
+            <div className="space-y-3">
+              {savedCollections.map((saved) => (
+                <SavedCollectionCard
+                  key={saved.id}
+                  saved={saved}
+                  onUnsave={setUnsaveTarget}
+                />
+              ))}
+            </div>
           </div>
         )}
 
@@ -246,6 +276,15 @@ export default function Dashboard() {
         title="Move to trash?"
         message={`"${deleteTarget?.name}" will be moved to trash. You can restore it within 7 days.`}
         confirmLabel="Move to trash"
+      />
+
+      <ConfirmDialog
+        open={!!unsaveTarget}
+        onClose={() => setUnsaveTarget(null)}
+        onConfirm={handleUnsave}
+        title="Remove saved collection?"
+        message={`"${unsaveTarget?.name}" by ${unsaveTarget?.ownerUsername} will be removed from your saved collections.`}
+        confirmLabel="Remove"
       />
     </div>
   )

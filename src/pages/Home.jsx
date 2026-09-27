@@ -93,6 +93,11 @@ function DashboardMockup() {
             <span className="text-[11px] font-medium">New collection</span>
           </div>
         </div>
+        <h3 className="text-sm font-semibold tracking-tight text-[var(--color-ink)] mt-8 mb-3">Saved collections</h3>
+        <div className="space-y-3">
+          <MockCard emoji={'\u{1F5FA}'} name="World" metas="83" skill="Intermediate" region="World" regionCode="world" by="geo-friends" />
+          <MockCard emoji={'\u{1F1FA}\u{1F1F8}'} name="USA" metas="41" skill="Beginner" region="United States" regionCode="US" by="roadtripper" />
+        </div>
       </div>
     </div>
   )
@@ -141,7 +146,7 @@ function CollectionMockup() {
   )
 }
 
-function MockCard({ emoji, name, metas, visibility, skill, region, regionCode }) {
+function MockCard({ emoji, name, metas, visibility, skill, region, regionCode, by }) {
   const lockIcon = visibility === 'Private' ? (
     <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
@@ -161,10 +166,17 @@ function MockCard({ emoji, name, metas, visibility, skill, region, regionCode })
         <div className="text-xs font-medium text-[var(--color-ink)] truncate">{name}</div>
         <div className="text-[11px] text-[var(--color-ink-faint)] mt-0.5 flex items-center gap-1.5">
           <span>{metas} metas</span>
-          <span className="inline-flex items-center gap-0.5 text-[var(--color-ink-faint)]">
-            {lockIcon}
-            {visibility}
-          </span>
+          {visibility && (
+            <span className="inline-flex items-center gap-0.5 text-[var(--color-ink-faint)]">
+              {lockIcon}
+              {visibility}
+            </span>
+          )}
+          {by && (
+            <span className="inline-flex items-center gap-0.5 text-[var(--color-ink-faint)]">
+              by <span className="text-[var(--color-ink-muted)]">{by}</span>
+            </span>
+          )}
         </div>
         {(skill || region) && (
           <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
