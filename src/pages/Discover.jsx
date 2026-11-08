@@ -13,6 +13,7 @@ import Flag from '../components/ui/Flag'
 import DiscoverRegionFilter from '../components/discover/DiscoverRegionFilter'
 import { getRegion, getContinent, WORLD } from '../lib/regions'
 import { avatarColorFromUsername } from '../lib/avatar'
+import { ArrowLeft, ArrowRight } from '../components/ui/Arrow'
 import { usePageMeta } from '../lib/seo'
 
 const PAGE_SIZE = 10
@@ -78,7 +79,7 @@ export default function Discover() {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-10 bg-[var(--color-surface)]/80 backdrop-blur-md border-b border-[var(--color-border)]">
+      <header className="sticky top-0 z-10 bg-[var(--color-surface)] border-b border-[var(--color-border)]">
         <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link to="/dashboard" className="flex items-center gap-2 text-sm font-semibold tracking-tight text-[var(--color-ink)]">
             <Logo />
@@ -103,16 +104,12 @@ export default function Discover() {
       </header>
 
       <main className="max-w-3xl mx-auto px-6 py-10">
-        <h1 className="text-2xl font-semibold tracking-tight text-[var(--color-ink)] mb-1">
+        <p className="eyebrow mb-2">Explore</p>
+        <h1 className="font-serif text-3xl font-semibold tracking-tight text-[var(--color-ink)] mb-6">
           Discover
         </h1>
-        {isCollectionsMode && (q || isFiltered) && (
-          <p className="text-sm text-[var(--color-ink-faint)] mb-6">
-            {results.length} {results.length === 1 ? 'collection' : 'collections'}
-          </p>
-        )}
 
-        <div className="space-y-3 mb-8">
+        <div className="space-y-3 mb-6">
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-ink-faint)] pointer-events-none">
@@ -181,6 +178,15 @@ export default function Discover() {
           </p>
         ) : (
           <>
+            <div className="flex items-center border-t border-[var(--color-border)] pt-3 mb-3">
+              <span className="eyebrow">
+                {isCollectionsMode
+                  ? q || isFiltered
+                    ? 'Results'
+                    : 'Most saved'
+                  : 'People'}
+              </span>
+            </div>
             <div className="space-y-3">
               {isCollectionsMode
                 ? shown.map((c) => (
@@ -217,19 +223,21 @@ export default function Discover() {
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={safePage === 1}
-                  className="text-sm text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                  className="group/pager flex items-center gap-1.5 text-sm text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
                 >
-                  &larr; Previous
+                  <ArrowLeft className="transition-transform group-hover/pager:-translate-x-0.5" />
+                  Previous
                 </button>
-                <span className="text-sm tabular-nums text-[var(--color-ink-faint)]">
+                <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink-faint)]">
                   {safePage} / {totalPages}
                 </span>
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={safePage === totalPages}
-                  className="text-sm text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                  className="group/pager flex items-center gap-1.5 text-sm text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
                 >
-                  Next &rarr;
+                  Next
+                  <ArrowRight className="transition-transform group-hover/pager:translate-x-0.5" />
                 </button>
               </div>
             )}
@@ -245,14 +253,14 @@ function DiscoverCollectionCard({ collection, isSaved, canSave, onToggleSave }) 
   const skill = collection.skillLevel ? SKILL_LABELS[collection.skillLevel] : null
 
   return (
-    <div className="group relative flex items-center gap-3 bg-[var(--color-surface-raised)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] rounded-lg p-4 transition-all">
+    <div className="group card-hover relative flex items-center gap-3 bg-[var(--color-surface-raised)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] rounded-lg p-4 transition-all">
       <Link
         to={`/${collection.ownerUsername}/${collection.name}`}
         className="group absolute inset-0 rounded-lg z-0"
         tabIndex={-1}
         aria-label={`Open ${collection.name}`}
       />
-      <Link to={`/${collection.ownerUsername}/${collection.name}`} className="w-10 h-10 flex items-center justify-center rounded-lg text-xl shrink-0">
+      <Link to={`/${collection.ownerUsername}/${collection.name}`} className="w-10 h-10 flex items-center justify-center rounded-lg text-xl shrink-0 border border-[var(--color-border)] bg-[var(--color-surface)]/60">
         {collection.emoji || (
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-[var(--color-ink-faint)]">
             <circle cx="10" cy="10" r="8" strokeDasharray="3 3"/>
@@ -339,7 +347,7 @@ function DiscoverUserCard({ user, publicCollectionCount }) {
   return (
     <Link
       to={`/${user.username}`}
-      className="flex items-center gap-3 bg-[var(--color-surface-raised)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] rounded-lg p-4 transition-all"
+      className="card-hover flex items-center gap-3 bg-[var(--color-surface-raised)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] rounded-lg p-4 transition-all"
     >
       <Avatar
         username={user.username}

@@ -1,4 +1,3 @@
-import { useEffect, useRef, useCallback } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import L from 'leaflet'
@@ -6,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import Button from '../components/ui/Button'
 import Flag from '../components/ui/Flag'
 import Logo from '../components/ui/Logo'
+import { ArrowRight } from '../components/ui/Arrow'
 import { usePageMeta } from '../lib/seo'
 
 const PIN_COLORS = ['#e53935', '#1e88e5', '#43a047']
@@ -24,50 +24,9 @@ function createPinIcon(color) {
 
 const pinIcons = PIN_COLORS.map((c) => createPinIcon(c))
 
-function TiltCard({ children, glossIntensity = 0.07 }) {
-  const ref = useRef(null)
-  const frameRef = useRef(null)
-  const intensityRef = useRef(glossIntensity)
-  intensityRef.current = glossIntensity
-
-  const handleMouseMove = useCallback((e) => {
-    if (frameRef.current) cancelAnimationFrame(frameRef.current)
-    frameRef.current = requestAnimationFrame(() => {
-      const el = ref.current
-      if (!el) return
-      const rect = el.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const y = e.clientY - rect.top
-      const midX = rect.width / 2
-      const midY = rect.height / 2
-      const rotateY = ((x - midX) / midX) * 6
-      const rotateX = ((midY - y) / midY) * 6
-      el.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.01)`
-      const gloss = el.querySelector('.gloss')
-      if (gloss) {
-        gloss.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,${intensityRef.current}) 0%, transparent 50%)`
-        gloss.style.opacity = '1'
-      }
-    })
-  }, [])
-
-  const handleMouseLeave = useCallback(() => {
-    const el = ref.current
-    if (!el) return
-    el.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale(1)'
-    const gloss = el.querySelector('.gloss')
-    if (gloss) gloss.style.opacity = '0'
-  }, [])
-
+function Figure({ children }) {
   return (
-    <div
-      ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      className="relative rounded-xl border border-[var(--color-border)] overflow-hidden shadow-sm transition-transform duration-200 ease-out select-none"
-      style={{ transformStyle: 'preserve-3d' }}
-    >
-      <div className="gloss absolute inset-0 pointer-events-none z-10 opacity-0 transition-opacity duration-300" />
+    <div className="relative rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] overflow-hidden shadow-sm">
       <div className="pointer-events-none">{children}</div>
     </div>
   )
@@ -77,11 +36,14 @@ function DashboardMockup() {
   return (
     <div className="bg-[var(--color-surface)]">
       <div className="h-11 border-b border-[var(--color-border)] flex items-center px-5">
-        <span className="text-xs font-semibold tracking-tight text-[var(--color-ink)]">Meta Collections</span>
+        <span className="flex items-center gap-1.5 text-xs font-semibold tracking-tight text-[var(--color-ink)]">
+          <Logo size={13} />
+          Meta Collections
+        </span>
         <div className="ml-auto w-4 h-4 rounded-full bg-[var(--color-border)]/50" />
       </div>
       <div className="px-8 py-8">
-        <h3 className="text-lg font-semibold tracking-tight text-[var(--color-ink)] mb-5">Your collections</h3>
+        <h3 className="font-serif text-lg font-semibold tracking-tight text-[var(--color-ink)] mb-5">Your collections</h3>
         <div className="space-y-3">
           <MockCard emoji={'\u{1F3F0}'} name="Europe" metas="2" visibility="Private" skill="Beginner" region="Estonia" regionCode="EE" />
           <MockCard emoji={'\u{1F310}'} name="Public" metas="157" visibility="Public" skill="Advanced" region="World" regionCode="world" />
@@ -120,9 +82,6 @@ function CollectionMockup() {
           <span className="text-[11px] font-medium text-[var(--color-surface)] bg-[var(--color-ink)] rounded-md px-2.5 py-1">
             + Add meta
           </span>
-        </div>
-        <div className="flex justify-end">
-          <span className="text-[11px] tabular-nums text-[var(--color-ink-faint)]">2/1000</span>
         </div>
       </div>
       <div className="px-8 py-6 space-y-3">
@@ -266,11 +225,14 @@ function CompassIcon() {
   )
 }
 
-function Feature({ icon, title, description }) {
+function Feature({ index, icon, title, description }) {
   return (
-    <div>
-      <div className="w-9 h-9 rounded-lg bg-[var(--color-surface-raised)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-ink-muted)] mb-4">
-        {icon}
+    <div className="bg-[var(--color-surface-raised)] p-6 sm:p-7">
+      <div className="flex items-center justify-between mb-8">
+        <span className="w-9 h-9 rounded-md border border-[var(--color-border)] flex items-center justify-center text-[var(--color-ink-muted)]">
+          {icon}
+        </span>
+        <span className="font-mono text-[11px] text-[var(--color-ink-faint)]">0{index}</span>
       </div>
       <h3 className="text-sm font-medium text-[var(--color-ink)] mb-1.5">{title}</h3>
       <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed">{description}</p>
@@ -290,7 +252,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-10 bg-[var(--color-surface)]/80 backdrop-blur-md border-b border-[var(--color-border)]">
+      <header className="sticky top-0 z-10 bg-[var(--color-surface)] border-b border-[var(--color-border)]">
         <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
           <span className="flex items-center gap-2 text-sm font-semibold tracking-tight text-[var(--color-ink)]">
             <Logo />
@@ -308,71 +270,93 @@ export default function Home() {
       </header>
 
       <main>
-        <section className="max-w-5xl mx-auto px-6 pt-20 pb-20 sm:pt-28 sm:pb-28">
-          <div className="max-w-2xl">
-            <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight text-[var(--color-ink)] leading-[1.1]">
-              Your GeoGuessr metas,<br />in one place.
-            </h1>
-            <p className="text-base sm:text-lg text-[var(--color-ink-muted)] mt-5 leading-relaxed max-w-lg">
-              Your metas are scattered across Discord, notes apps, and
-              bookmarks you'll never open again. Put them somewhere
-              you can actually find them.
-            </p>
-            <div className="flex items-center gap-3 mt-8">
-              <Link to="/signup">
-                <Button>Get started</Button>
-              </Link>
-              <Link to="/login" className="text-sm text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors px-3 py-2">
-                Already have an account?
-              </Link>
+        <section className="relative overflow-hidden">
+          <div className="absolute inset-0 dot-grid-fade opacity-70 pointer-events-none" aria-hidden="true" />
+          <div className="relative max-w-5xl mx-auto px-6 pt-16 pb-20 sm:pt-24 sm:pb-24">
+            <div className="max-w-3xl">
+              <p className="eyebrow mb-6">GeoGuessr meta organizer</p>
+              <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[var(--color-ink)] leading-[1.02]">
+                Your GeoGuessr metas,<br />in one place.
+              </h1>
+              <p className="text-base sm:text-lg text-[var(--color-ink-muted)] mt-6 leading-relaxed max-w-lg">
+                Your metas are scattered across Discord, notes apps, and
+                bookmarks you'll never open again. Put them somewhere
+                you can actually find them.
+              </p>
+              <div className="flex flex-wrap items-center gap-3 mt-9">
+                <Link to="/signup">
+                  <Button>Get started</Button>
+                </Link>
+                <Link to="/login" className="text-sm text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors px-3 py-2">
+                  I already have an account
+                </Link>
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="max-w-5xl mx-auto px-6 pb-24">
+        <section className="max-w-5xl mx-auto px-6 pb-16 sm:pb-20">
           <Link
             to="/discover"
-            className="group flex items-center justify-between gap-4 w-full bg-[var(--color-surface-raised)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] rounded-xl px-6 py-5 transition-all"
+            className="group relative flex items-center justify-between gap-4 w-full bg-[var(--color-surface-raised)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] rounded-xl pl-5 pr-6 py-5 transition-colors overflow-hidden"
           >
+            <span className="absolute left-0 top-0 bottom-0 w-1 bg-[var(--color-accent)]" aria-hidden="true" />
             <div className="flex items-center gap-4 min-w-0">
               <div className="w-10 h-10 rounded-lg bg-[var(--color-ink)] text-[var(--color-surface)] flex items-center justify-center shrink-0">
                 <CompassIcon />
               </div>
               <div className="min-w-0">
-                <h3 className="text-sm font-medium text-[var(--color-ink)]">Browse public collections</h3>
-                <p className="text-sm text-[var(--color-ink-muted)] truncate">
-                  No account needed - check out the most saved metas right away.
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-medium text-[var(--color-ink)]">Browse public collections</h3>
+                  <span className="hidden sm:inline font-mono text-[9px] uppercase tracking-[0.14em] text-[var(--color-accent)]">No sign-in</span>
+                </div>
+                <p className="text-sm text-[var(--color-ink-muted)] line-clamp-2 sm:truncate">
+                  Check out the most saved metas right away.
                 </p>
               </div>
             </div>
-            <span className="text-sm text-[var(--color-ink-muted)] group-hover:text-[var(--color-ink)] transition-colors shrink-0">
-              Discover &rarr;
+            <span className="flex items-center gap-1.5 text-sm text-[var(--color-ink-muted)] group-hover:text-[var(--color-ink)] transition-colors shrink-0">
+              Discover
+              <ArrowRight className="transition-transform group-hover:translate-x-0.5" />
             </span>
           </Link>
         </section>
 
         <section className="max-w-5xl mx-auto px-6 pb-24">
-          <TiltCard glossIntensity={0.03}>
+          <div className="flex items-end justify-between mb-4">
+            <span className="eyebrow">The dashboard</span>
+            <span className="font-mono text-[11px] text-[var(--color-ink-faint)]">Fig. 01</span>
+          </div>
+          <Figure>
             <DashboardMockup />
-          </TiltCard>
+          </Figure>
         </section>
 
         <section className="max-w-5xl mx-auto px-6 pb-24">
-          <h2 className="text-2xl font-semibold tracking-tight text-[var(--color-ink)] mb-12">
-            What you can do
-          </h2>
-          <div className="grid sm:grid-cols-3 gap-8 sm:gap-12">
+          <div className="flex items-end justify-between gap-6 mb-10 border-t border-[var(--color-border)] pt-6">
+            <div>
+              <p className="eyebrow mb-3">What you get</p>
+              <h2 className="font-serif text-3xl sm:text-4xl font-semibold tracking-tight text-[var(--color-ink)]">
+                Maps, Street View, and a share link.
+              </h2>
+            </div>
+            <span className="hidden sm:block font-mono text-[11px] text-[var(--color-ink-faint)] shrink-0 pb-1">01 &mdash; 03</span>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-px bg-[var(--color-border)] border border-[var(--color-border)] rounded-xl overflow-hidden">
             <Feature
+              index={1}
               icon={<PinIcon />}
               title="Mark things on a map"
               description="Explain your meta and drop up to 3 pins on the map to show exactly where to plonk."
             />
             <Feature
+              index={2}
               icon={<LinkIcon />}
               title="Add Street View links"
               description="Show the exact frame instead of just trying to describe it."
             />
             <Feature
+              index={3}
               icon={<ShareIcon />}
               title="Go public or stay private"
               description="Public collections give anyone read-only access with just a URL. Private ones stay yours."
@@ -381,15 +365,25 @@ export default function Home() {
         </section>
 
         <section className="max-w-5xl mx-auto px-6 pb-24">
-          <TiltCard>
+          <div className="flex items-end justify-between mb-4">
+            <span className="eyebrow">A collection</span>
+            <span className="font-mono text-[11px] text-[var(--color-ink-faint)]">Fig. 02</span>
+          </div>
+          <Figure>
             <CollectionMockup />
-          </TiltCard>
+          </Figure>
         </section>
       </main>
 
       <footer className="border-t border-[var(--color-border)]">
-        <div className="max-w-5xl mx-auto px-6 py-6 flex items-center justify-between">
-          <span className="text-xs text-[var(--color-ink-faint)]">Meta Collections</span>
+        <div className="max-w-5xl mx-auto px-6 py-8 flex flex-wrap items-center justify-between gap-4">
+          <span className="flex items-center gap-2 text-xs text-[var(--color-ink-faint)]">
+            <Logo size={16} />
+            <span className="font-medium text-[var(--color-ink-muted)]">Meta Collections</span>
+          </span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-faint)]">
+            Made for GeoGuessr
+          </span>
           <a href="https://github.com/hannogeo/meta-collections" target="_blank" rel="noopener noreferrer" className="text-xs text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] transition-colors">
             GitHub
           </a>

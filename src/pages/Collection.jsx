@@ -9,6 +9,7 @@ import CollectionSettings from '../components/dashboard/CollectionSettings'
 import Button from '../components/ui/Button'
 import Modal from '../components/ui/Modal'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
+import { ArrowLeft } from '../components/ui/Arrow'
 import { usePageMeta } from '../lib/seo'
 import { getRegion } from '../lib/regions'
 import { useSavedCollections } from '../hooks/useSavedCollections'
@@ -202,14 +203,15 @@ export default function Collection() {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-10 bg-[var(--color-surface)]/80 backdrop-blur-md border-b border-[var(--color-border)]">
-        <div className="max-w-3xl mx-auto px-6 h-14 grid grid-cols-3 items-center group">
-          <div className="flex items-center gap-3 min-w-0">
+      <header className="sticky top-0 z-10 bg-[var(--color-surface)] border-b border-[var(--color-border)]">
+        <div className="max-w-3xl mx-auto px-6 h-14 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 group">
+          <div className="flex items-center gap-2 min-w-0">
             <button
               onClick={() => user ? navigate('/dashboard') : navigate('/')}
-              className="text-xs text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors cursor-pointer shrink-0"
+              className="flex items-center gap-1 text-xs text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors cursor-pointer shrink-0 group/back"
             >
-              &larr; {user ? 'All' : 'Home'}
+              <ArrowLeft className="transition-transform group-hover/back:-translate-x-0.5" />
+              <span className="hidden sm:inline">{user ? 'All' : 'Home'}</span>
             </button>
             {canEdit && (
               <EmojiPicker
@@ -239,7 +241,7 @@ export default function Collection() {
             )}
             <button
               onClick={canEdit ? openRename : undefined}
-              className={`text-sm font-semibold tracking-tight text-[var(--color-ink)] truncate ${canEdit ? 'hover:underline underline-offset-2 decoration-[var(--color-border)] hover:decoration-[var(--color-ink)] transition-colors cursor-pointer' : ''}`}
+              className={`font-serif text-base font-semibold tracking-tight text-[var(--color-ink)] truncate ${canEdit ? 'hover:underline underline-offset-2 decoration-[var(--color-border)] hover:decoration-[var(--color-ink)] transition-colors cursor-pointer' : ''}`}
             >
               {collection.name}
             </button>
@@ -258,7 +260,7 @@ export default function Collection() {
             {canEdit && (
               <button
                 onClick={() => setShowAdd(true)}
-                className="text-xs font-medium text-[var(--color-surface)] bg-[var(--color-ink)] rounded-md px-3 py-1.5 hover:bg-[var(--color-accent-hover)] transition-colors cursor-pointer"
+                className="text-xs font-medium text-[var(--color-accent-ink)] bg-[var(--color-accent)] rounded-md px-3 py-1.5 hover:bg-[var(--color-accent-hover)] transition-colors cursor-pointer"
               >
                 +{' '}Add meta
               </button>
@@ -272,46 +274,27 @@ export default function Collection() {
         </div>
       </header>
 
-      {metas.length > 0 && (
-        <div className="fixed top-16 right-6 z-[8]">
-          {metas.length > 2 && (
-            <div className="relative">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--color-ink-faint)] pointer-events-none">
-                <circle cx="11" cy="11" r="8"/>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search metas..."
-                className="w-44 pl-8 pr-3 py-1.5 text-xs bg-transparent border border-[var(--color-border)] rounded-md text-[var(--color-ink)] placeholder:text-[var(--color-ink-faint)] focus:outline-none focus:border-[var(--color-ink)] focus:w-60 transition-all"
-              />
-            </div>
-          )}
-        </div>
-      )}
-
       <main className="max-w-3xl mx-auto px-6 py-10">
 
         {!user && (
-          <div className="mb-8 px-4 py-3 bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg flex items-center justify-between">
-            <p className="text-sm text-[var(--color-ink-muted)]">
-              This is a public collection.
+          <div className="mb-8 flex items-center justify-between gap-4 border-y border-[var(--color-border)] py-3">
+            <p className="flex items-center gap-2 text-xs text-[var(--color-ink-muted)]">
+              <span className="eyebrow">Public collection</span>
+              <span className="text-[var(--color-ink-faint)]">Read-only</span>
             </p>
-            <a href="/login" className="text-sm text-[var(--color-ink)] font-medium hover:underline underline-offset-2 decoration-[var(--color-border)] hover:decoration-[var(--color-ink)] transition-colors">
+            <a href="/login" className="font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--color-ink)] hover:text-[var(--color-accent)] transition-colors">
               Log in
             </a>
           </div>
         )}
         {user && !canEdit && (
-          <div className="mb-8 px-4 py-3 bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg flex items-center justify-between gap-4">
-            <p className="text-sm text-[var(--color-ink-muted)]">
-              This is a public collection by{' '}
+          <div className="mb-8 flex items-center justify-between gap-4 border-y border-[var(--color-border)] py-3">
+            <p className="text-xs text-[var(--color-ink-muted)]">
+              <span className="eyebrow mr-2">Public collection</span>
+              by{' '}
               <Link to={`/${username}`} className="text-[var(--color-ink)] font-medium hover:underline underline-offset-2 transition-colors">
                 {username}
               </Link>
-              . Read-only.
             </p>
             <div className="flex items-center gap-3 shrink-0">
               {saveError && (
@@ -362,7 +345,28 @@ export default function Collection() {
             </div>
           </div>
         ) : (
-          <div className="space-y-4">
+          <>
+            <div className="flex items-end justify-between gap-4 border-b border-[var(--color-border)] pb-2 mb-4">
+              <span className="eyebrow shrink-0">Metas</span>
+              <div className="flex items-center gap-3 min-w-0">
+                {metas.length > 2 && (
+                  <div className="relative min-w-0">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--color-ink-faint)] pointer-events-none">
+                      <circle cx="11" cy="11" r="8"/>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input
+                      type="text"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder="Search metas..."
+                      className="w-36 sm:w-44 pl-8 pr-3 py-1 text-xs bg-transparent border border-[var(--color-border)] rounded-md text-[var(--color-ink)] placeholder:text-[var(--color-ink-faint)] focus:outline-none focus:border-[var(--color-ink)] sm:focus:w-60 transition-all"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="space-y-4">
               {filteredMetas.map((meta, i) => (
                 <MetaCard
                   key={meta.id}
@@ -380,6 +384,7 @@ export default function Collection() {
               )}
               <div ref={bottomRef} />
             </div>
+          </>
         )}
       </main>
 

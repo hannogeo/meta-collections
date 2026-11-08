@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 firestore.rules
+AGENTS.md
 
 # Editor directories and files
 .vscode/*

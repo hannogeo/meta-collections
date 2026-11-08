@@ -8,6 +8,7 @@ import ConfirmDialog from '../components/ui/ConfirmDialog'
 import Avatar from '../components/ui/Avatar'
 import AvatarMenu from '../components/ui/AvatarMenu'
 import ColorPicker from '../components/ui/ColorPicker'
+import Logo from '../components/ui/Logo'
 import { setUsername, setAvatarColor, setProfileVisibility } from '../lib/users'
 import { avatarColorFromUsername } from '../lib/avatar'
 import { usePageMeta } from '../lib/seo'
@@ -111,9 +112,10 @@ export default function Settings() {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-10 bg-[var(--color-surface)]/80 backdrop-blur-md border-b border-[var(--color-border)]">
+      <header className="sticky top-0 z-10 bg-[var(--color-surface)] border-b border-[var(--color-border)]">
         <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
-          <Link to="/dashboard" className="text-sm font-semibold tracking-tight text-[var(--color-ink)]">
+          <Link to="/dashboard" className="flex items-center gap-2 text-sm font-semibold tracking-tight text-[var(--color-ink)]">
+            <Logo />
             Meta Collections
           </Link>
           <AvatarMenu />
@@ -121,22 +123,26 @@ export default function Settings() {
       </header>
 
       <main className="max-w-3xl mx-auto px-6 py-10">
-        <h2 className="text-2xl font-semibold tracking-tight text-[var(--color-ink)] mb-8">
+        <p className="eyebrow mb-2">Account</p>
+        <h2 className="font-serif text-3xl font-semibold tracking-tight text-[var(--color-ink)] mb-8">
           Settings
         </h2>
 
         <div className="flex gap-10">
-          <nav className="hidden md:flex flex-col items-stretch w-40 shrink-0">
+          <nav className="hidden md:flex flex-col items-stretch w-40 shrink-0 border-l border-[var(--color-border)]">
             {sections.map((s) => (
               <button
                 key={s.id}
                 onClick={() => setActiveSection(s.id)}
-                className={`text-left px-3 py-2 text-sm rounded-md transition-colors cursor-pointer ${
+                className={`relative text-left px-4 py-2 text-sm transition-colors cursor-pointer ${
                   activeSection === s.id
-                    ? 'bg-[var(--color-border)]/40 text-[var(--color-ink)] font-medium'
-                    : 'text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] hover:bg-[var(--color-border)]/20'
+                    ? 'text-[var(--color-ink)] font-medium'
+                    : 'text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]'
                 }`}
               >
+                {activeSection === s.id && (
+                  <span className="absolute left-0 top-1.5 bottom-1.5 -ml-px w-px bg-[var(--color-accent)]" aria-hidden="true" />
+                )}
                 {s.label}
               </button>
             ))}
@@ -162,7 +168,7 @@ export default function Settings() {
             {activeSection === 'profile' && (
               <form onSubmit={handleSaveProfile}>
                 <section className="mb-10">
-                  <h3 className="text-sm font-medium text-[var(--color-ink)] mb-3">
+                  <h3 className="font-serif text-base font-semibold text-[var(--color-ink)] mb-3">
                     {!hasProfile ? 'Choose a username' : 'Username'}
                   </h3>
                   <div className="flex-1 max-w-xs">
@@ -178,7 +184,7 @@ export default function Settings() {
                 </section>
 
                 <section className="mb-10">
-                  <h3 className="text-sm font-medium text-[var(--color-ink)] mb-4">Profile picture</h3>
+                  <h3 className="font-serif text-base font-semibold text-[var(--color-ink)] mb-4">Profile picture</h3>
                   <div className="flex items-center gap-6">
                     <Avatar username={usernameValue || userProfile?.username} color={avatarColor} size={64} />
                     <div className="flex-1 min-w-0">
@@ -188,8 +194,8 @@ export default function Settings() {
                 </section>
 
                 <section className="mb-10">
-                  <h3 className="text-sm font-medium text-[var(--color-ink)] mb-3">Profile visibility</h3>
-                  <div className="inline-flex rounded-lg border border-[var(--color-border)] overflow-hidden">
+                  <h3 className="font-serif text-base font-semibold text-[var(--color-ink)] mb-3">Profile visibility</h3>
+                  <div className="inline-flex rounded-md border border-[var(--color-border)] overflow-hidden">
                     {[
                       { value: 'public', label: 'Public', description: 'Anyone can view your profile' },
                       { value: 'private', label: 'Private', description: 'Only you can view your profile' },
@@ -199,7 +205,7 @@ export default function Settings() {
                         onClick={() => setVisibilityValue(v.value)}
                         className={`px-4 py-2 text-sm transition-colors cursor-pointer ${
                           visibilityValue === v.value
-                            ? 'bg-[var(--color-surface-raised)] text-[var(--color-ink)] font-medium'
+                            ? 'bg-[var(--color-ink)] text-[var(--color-surface)] font-medium'
                             : 'text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] hover:bg-[var(--color-border)]/30'
                         }`}
                       >
@@ -223,7 +229,7 @@ export default function Settings() {
                       <span className="text-xs text-[var(--color-danger)]">{profileError}</span>
                     )}
                     {profileSuccess && !profileError && (
-                      <span className="text-xs text-green-600">{profileSuccess}</span>
+                      <span className="text-xs text-[var(--color-success)]">{profileSuccess}</span>
                     )}
                   </div>
                 </section>
@@ -232,15 +238,15 @@ export default function Settings() {
 
             {activeSection === 'appearance' && (
               <section>
-                <h3 className="text-sm font-medium text-[var(--color-ink)] mb-3">Appearance</h3>
-                <div className="inline-flex rounded-lg border border-[var(--color-border)] overflow-hidden">
+                <h3 className="font-serif text-base font-semibold text-[var(--color-ink)] mb-3">Appearance</h3>
+                <div className="inline-flex rounded-md border border-[var(--color-border)] overflow-hidden">
                   {themes.map((t) => (
                     <button
                       key={t.value}
                       onClick={() => setTheme(t.value)}
                       className={`px-4 py-2 text-sm transition-colors cursor-pointer ${
                         theme === t.value
-                          ? 'bg-[var(--color-surface-raised)] text-[var(--color-ink)] font-medium'
+                          ? 'bg-[var(--color-ink)] text-[var(--color-surface)] font-medium'
                           : 'text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] hover:bg-[var(--color-border)]/30'
                       }`}
                     >
@@ -253,7 +259,7 @@ export default function Settings() {
 
             {activeSection === 'account' && (
               <section>
-                <h3 className="text-sm font-medium text-[var(--color-ink)] mb-4">Account</h3>
+                <h3 className="font-serif text-base font-semibold text-[var(--color-ink)] mb-4">Account</h3>
                 <div className="flex flex-col items-stretch gap-2 max-w-xs">
                   <div className="flex items-center justify-between px-3 py-2.5 bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-md">
                     <span className="text-sm text-[var(--color-ink-muted)]">Email</span>

@@ -12,13 +12,16 @@ export default function AppNav({ current }) {
         <NavLink
           key={l.key}
           to={l.to}
-          className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+          className={`relative px-3 py-1.5 text-sm rounded-md transition-colors ${
             current === l.key
               ? 'font-medium text-[var(--color-ink)]'
               : 'text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] hover:bg-[var(--color-border)]/30'
           }`}
         >
           {l.label}
+          {current === l.key && (
+            <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[var(--color-accent)]" />
+          )}
         </NavLink>
       ))}
     </nav>

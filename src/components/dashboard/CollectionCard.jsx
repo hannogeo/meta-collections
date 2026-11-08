@@ -29,7 +29,7 @@ export default function CollectionCard({ collection, username, onEdit, onDelete,
   }, [menuOpen])
 
   return (
-    <div className="group relative bg-[var(--color-surface-raised)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] rounded-lg p-4 transition-all flex items-center gap-3">
+    <div className="group card-hover relative bg-[var(--color-surface-raised)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] rounded-lg p-4 transition-all flex items-center gap-3">
       <Link
         to={`/${username}/${collection.name}`}
         className="absolute inset-0 rounded-lg z-0"
@@ -40,7 +40,7 @@ export default function CollectionCard({ collection, username, onEdit, onDelete,
         onChange={(e) => onUpdateEmoji(collection.id, e)}
       >
         <div
-          className="group/emoji relative z-10 w-10 h-10 flex items-center justify-center rounded-lg hover:bg-[var(--color-border)]/50 transition-colors text-xl shrink-0 cursor-pointer"
+          className="group/emoji relative z-10 w-10 h-10 flex items-center justify-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)]/60 hover:bg-[var(--color-border)]/40 transition-colors text-xl shrink-0 cursor-pointer"
           title="Change icon"
         >
           {collection.emoji || (

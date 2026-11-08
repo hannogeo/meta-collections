@@ -5,6 +5,7 @@ import { Navigate, Link } from 'react-router-dom'
 import Button from '../components/ui/Button'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
+import { ArrowLeft } from '../components/ui/Arrow'
 import { usePageMeta } from '../lib/seo'
 
 function daysRemaining(deletedAt) {
@@ -44,12 +45,13 @@ export default function Trash() {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-10 bg-[var(--color-surface)]/80 backdrop-blur-md border-b border-[var(--color-border)]">
+      <header className="sticky top-0 z-10 bg-[var(--color-surface)] border-b border-[var(--color-border)]">
         <div className="max-w-3xl mx-auto px-6 h-14 flex items-center gap-4">
-          <Link to="/dashboard" className="text-xs text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors">
-            &larr; All
+          <Link to="/dashboard" className="group/back flex items-center gap-1 text-xs text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors">
+            <ArrowLeft className="transition-transform group-hover/back:-translate-x-0.5" />
+            All
           </Link>
-          <h1 className="text-sm font-semibold tracking-tight text-[var(--color-ink)]">Trash</h1>
+          <h1 className="font-serif text-base font-semibold tracking-tight text-[var(--color-ink)]">Trash</h1>
         </div>
       </header>
 
@@ -57,6 +59,7 @@ export default function Trash() {
         {trashCollections.length === 0 ? (
           <div className="py-20">
             <div className="max-w-sm mx-auto text-center">
+              <p className="eyebrow mb-3">Archive</p>
               <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed">
                 Trash is empty. Deleted collections appear here and are permanently removed after 7 days.
               </p>
@@ -64,9 +67,9 @@ export default function Trash() {
           </div>
         ) : (
           <>
-            <p className="text-xs text-[var(--color-ink-faint)] mb-8">
-              Deleted collections are kept for 7 days, then permanently removed.
-            </p>
+            <div className="mb-6 flex items-center border-y border-[var(--color-border)] py-3">
+              <span className="eyebrow">Deleted collections</span>
+            </div>
 
             <div className="space-y-3 mb-8">
               {trashCollections.map((col) => (
@@ -98,9 +101,14 @@ export default function Trash() {
               ))}
             </div>
 
-            <Button variant="danger" onClick={() => setShowEmptyTrash(true)}>
-              Empty trash
-            </Button>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <p className="text-xs text-[var(--color-ink-faint)]">
+                Kept for 7 days, then permanently removed.
+              </p>
+              <Button variant="danger" onClick={() => setShowEmptyTrash(true)}>
+                Empty trash
+              </Button>
+            </div>
           </>
         )}
       </main>

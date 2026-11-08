@@ -13,13 +13,13 @@ export default function SavedCollectionCard({ saved, onUnsave }) {
   const skill = saved.skillLevel ? SKILL_LABELS[saved.skillLevel] : null
 
   return (
-    <div className="group relative bg-[var(--color-surface-raised)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] rounded-lg p-4 transition-all flex items-center gap-3">
+    <div className="group card-hover relative bg-[var(--color-surface-raised)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] rounded-lg p-4 transition-all flex items-center gap-3">
       <Link
         to={`/${saved.ownerUsername}/${saved.name}`}
         className="absolute inset-0 rounded-lg z-0"
         tabIndex={-1}
       />
-      <div className="w-10 h-10 flex items-center justify-center rounded-lg text-xl shrink-0">
+      <div className="w-10 h-10 flex items-center justify-center rounded-lg text-xl shrink-0 border border-[var(--color-border)] bg-[var(--color-surface)]/60">
         {saved.emoji}
       </div>
       <div className="flex-1 min-w-0 relative z-10 pointer-events-none">

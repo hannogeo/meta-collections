@@ -12,6 +12,7 @@ import LoadingSpinner from '../components/ui/LoadingSpinner'
 import Button from '../components/ui/Button'
 import Modal from '../components/ui/Modal'
 import Flag from '../components/ui/Flag'
+import Logo from '../components/ui/Logo'
 import { getRegion } from '../lib/regions'
 import { usePageMeta } from '../lib/seo'
 
@@ -124,9 +125,10 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-10 bg-[var(--color-surface)]/80 backdrop-blur-md border-b border-[var(--color-border)]">
+      <header className="sticky top-0 z-10 bg-[var(--color-surface)] border-b border-[var(--color-border)]">
         <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
-          <Link to="/" className="text-sm font-semibold tracking-tight text-[var(--color-ink)]">
+          <Link to="/" className="flex items-center gap-2 text-sm font-semibold tracking-tight text-[var(--color-ink)]">
+            <Logo />
             Meta Collections
           </Link>
           <div className="flex items-center gap-3">
@@ -147,6 +149,7 @@ export default function Profile() {
       </header>
 
       <main className="max-w-3xl mx-auto px-6 py-10">
+        <p className="eyebrow mb-6">Profile</p>
         <div className="flex items-start gap-5">
           <Avatar
             username={profile.username}
@@ -155,7 +158,7 @@ export default function Profile() {
           />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl font-semibold tracking-tight text-[var(--color-ink)] truncate">
+              <h1 className="font-serif text-3xl font-semibold tracking-tight text-[var(--color-ink)] truncate">
                 {profile.username}
               </h1>
               {user && !isViewerOwner && (
@@ -204,9 +207,11 @@ export default function Profile() {
         )}
 
         <div className="mt-12">
-          <h2 className="text-base font-semibold tracking-tight text-[var(--color-ink)] mb-4">
-            Public collections
-          </h2>
+          <div className="flex items-end border-b border-[var(--color-border)] pb-2 mb-4">
+            <h2 className="font-serif text-xl font-semibold tracking-tight text-[var(--color-ink)]">
+              Public collections
+            </h2>
+          </div>
           {collections.length === 0 ? (
             <p className="text-sm text-[var(--color-ink-muted)]">
               No public collections yet.
@@ -285,7 +290,7 @@ function ProfileCollectionCard({ collection, username, canSave, isSaved, onToggl
   const skill = collection.skillLevel ? SKILL_LABELS[collection.skillLevel] : null
 
   return (
-    <div className="group relative bg-[var(--color-surface-raised)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] rounded-lg p-4 transition-all flex items-center gap-3">
+    <div className="group card-hover relative bg-[var(--color-surface-raised)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] rounded-lg p-4 transition-all flex items-center gap-3">
       <Link
         to={`/${username}/${collection.name}`}
         className="absolute inset-0 rounded-lg z-0"

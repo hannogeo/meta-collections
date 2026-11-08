@@ -94,7 +94,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-10 bg-[var(--color-surface)]/80 backdrop-blur-md border-b border-[var(--color-border)]">
+      <header className="sticky top-0 z-10 bg-[var(--color-surface)] border-b border-[var(--color-border)]">
         <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link to="/dashboard" className="flex items-center gap-2 text-sm font-semibold tracking-tight text-[var(--color-ink)]">
             <Logo />
@@ -109,11 +109,12 @@ export default function Dashboard() {
 
       <main className="max-w-3xl mx-auto px-6 py-10">
         <div className="mb-10">
-          <h2 className="text-2xl font-semibold tracking-tight text-[var(--color-ink)]">
+          <p className="eyebrow mb-2">Workspace</p>
+          <h2 className="font-serif text-3xl font-semibold tracking-tight text-[var(--color-ink)]">
             {collections.length === 0 ? 'Welcome' : 'Your collections'}
           </h2>
           {collections.length > 0 && (
-            <p className="text-sm text-[var(--color-ink-faint)] mt-1 flex items-center gap-2">
+            <p className="text-sm text-[var(--color-ink-faint)] mt-2 flex items-center gap-2">
               <span>{collections.length} {collections.length === 1 ? 'collection' : 'collections'} &middot; {totalMetas} {totalMetas === 1 ? 'meta' : 'metas'} total</span>
               <Link to="/trash" className="inline-flex items-center justify-center w-5 h-5 rounded hover:bg-[var(--color-border)]/40 transition-colors" title="Trash">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -133,7 +134,7 @@ export default function Dashboard() {
         ) : collections.length === 0 ? (
           <div className="py-20">
             <div className="max-w-md">
-              <h3 className="text-base font-medium text-[var(--color-ink)] mb-2">Start collecting metas</h3>
+              <h3 className="font-serif text-xl font-semibold text-[var(--color-ink)] mb-2">Start collecting metas</h3>
               <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed mb-6">
                 Create a collection to organize your GeoGuessr tips, tricks, and location markers.
               </p>
@@ -169,10 +170,12 @@ export default function Dashboard() {
 
         {savedCollections.length > 0 && (
           <div className="mt-12">
-            <h2 className="text-base font-semibold tracking-tight text-[var(--color-ink)]">
-              Saved collections
-            </h2>
-            <p className="text-sm text-[var(--color-ink-faint)] mt-1 mb-4">
+            <div className="flex items-end border-b border-[var(--color-border)] pb-2">
+              <h2 className="font-serif text-xl font-semibold tracking-tight text-[var(--color-ink)]">
+                Saved collections
+              </h2>
+            </div>
+            <p className="text-sm text-[var(--color-ink-faint)] mt-2 mb-4">
               Public collections you've saved from others.
             </p>
             <div className="space-y-3">
