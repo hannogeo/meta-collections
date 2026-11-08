@@ -2,6 +2,7 @@ import { Link, Navigate } from 'react-router-dom'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import L from 'leaflet'
 import { useAuth } from '../contexts/AuthContext'
+import LoadingSpinner from '../components/ui/LoadingSpinner'
 import Button from '../components/ui/Button'
 import Flag from '../components/ui/Flag'
 import Logo from '../components/ui/Logo'
@@ -241,13 +242,14 @@ function Feature({ index, icon, title, description }) {
 }
 
 export default function Home() {
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
 
   usePageMeta({
     title: 'Meta Collections - GeoGuessr metas, in one place',
     description: 'Store your GeoGuessr metas in one place - organize tips and tricks by region and skill level, search them, and reference them while you play.',
   })
 
+  if (authLoading) return <LoadingSpinner />
   if (user) return <Navigate to="/dashboard" replace />
 
   return (
