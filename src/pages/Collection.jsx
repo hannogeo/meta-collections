@@ -268,7 +268,9 @@ export default function Collection() {
           </div>
           <div className="flex justify-end">
             <span className="text-xs tabular-nums text-[var(--color-ink-faint)]">
-              {Number.isFinite(maxMetas) ? `${metas.length}/${maxMetas}` : metas.length}
+              {Number.isFinite(maxMetas)
+                ? `${metas.length}/${maxMetas}`
+                : `${metas.length} ${metas.length === 1 ? 'meta' : 'metas'}`}
             </span>
           </div>
         </div>
