@@ -17,7 +17,7 @@ import { useSavedCollections } from '../hooks/useSavedCollections'
 export default function Collection() {
   const { username, collectionName } = useParams()
   const { user, userProfile, loading: authLoading } = useAuth()
-  const { getMetas, addMeta, updateMeta, deleteMeta, updateEmoji, renameCollection, collections: ownerCollections, loading: collectionsLoading, loaded: collectionsLoaded, MAX_METAS } = useCollections(user?.uid)
+  const { getMetas, addMeta, updateMeta, deleteMeta, updateEmoji, renameCollection, collections: ownerCollections, loading: collectionsLoading, loaded: collectionsLoaded, maxMetas } = useCollections(user?.uid, { unlimited: !!userProfile?.unlimited })
   const { isSaved, saveCollection, unsaveCollection } = useSavedCollections(user?.uid)
 
   const [metas, setMetas] = useState([])
@@ -268,7 +268,7 @@ export default function Collection() {
           </div>
           <div className="flex justify-end">
             <span className="text-xs tabular-nums text-[var(--color-ink-faint)]">
-              {metas.length}/{MAX_METAS}
+              {Number.isFinite(maxMetas) ? `${metas.length}/${maxMetas}` : metas.length}
             </span>
           </div>
         </div>
@@ -396,8 +396,6 @@ export default function Collection() {
             onSubmit={handleAdd}
             title="Add meta"
             submitLabel="Add"
-            metaCount={metas.length}
-            maxMetas={MAX_METAS}
           />
 
           <MetaFormModal

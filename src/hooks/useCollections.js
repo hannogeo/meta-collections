@@ -19,13 +19,22 @@ import { getUserUid } from '../lib/users'
 const MAX_COLLECTIONS = 5
 const MAX_METAS = 1000
 
+// Users with `unlimited: true` on users/{uid} are not capped (see AGENTS.md).
+export function effectiveLimits(unlimited) {
+  return {
+    maxCollections: unlimited ? Infinity : MAX_COLLECTIONS,
+    maxMetas: unlimited ? Infinity : MAX_METAS,
+  }
+}
+
 function requirePublicDetails(visibility, skillLevel, region) {
   if (visibility === 'public' && (!skillLevel || !region)) {
     throw new Error('Public collections need a skill level and a region')
   }
 }
 
-export function useCollections(userId) {
+export function useCollections(userId, { unlimited = false } = {}) {
+  const { maxCollections, maxMetas } = effectiveLimits(unlimited)
   const [collections, setCollections] = useState([])
   const [trashCollections, setTrashCollections] = useState([])
   const [loading, setLoading] = useState(true)
@@ -70,8 +79,8 @@ export function useCollections(userId) {
 
   async function createCollection(name, emoji, visibility = 'private', skillLevel = null, region = null) {
     const activeCount = collections.length
-    if (activeCount >= MAX_COLLECTIONS) {
-      throw new Error(`Maximum of ${MAX_COLLECTIONS} collections reached`)
+    if (activeCount >= maxCollections) {
+      throw new Error(`Maximum of ${maxCollections} collections reached`)
     }
     if (isNameTaken(name)) {
       throw new Error('A collection with this name already exists')
@@ -156,8 +165,8 @@ export function useCollections(userId) {
     const colDoc = await getDoc(doc(db, 'users', userId, 'collections', collectionId))
     const colData = colDoc.data()
 
-    if (colData.metaCount >= MAX_METAS) {
-      throw new Error(`Maximum of ${MAX_METAS} metas per collection reached`)
+    if (colData.metaCount >= maxMetas) {
+      throw new Error(`Maximum of ${maxMetas} metas per collection reached`)
     }
 
     const metaRef = await addDoc(
@@ -209,8 +218,8 @@ export function useCollections(userId) {
     addMeta,
     updateMeta,
     deleteMeta,
-    MAX_COLLECTIONS,
-    MAX_METAS,
+    maxCollections,
+    maxMetas,
   }
 }
 

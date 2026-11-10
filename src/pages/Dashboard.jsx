@@ -19,7 +19,7 @@ import { useSavedCollections } from '../hooks/useSavedCollections'
 
 export default function Dashboard() {
   const { user, userProfile, loading: authLoading } = useAuth()
-  const { collections, loading, createCollection, renameCollection, updateEmoji, softDeleteCollection, MAX_COLLECTIONS } = useCollections(user?.uid)
+  const { collections, loading, createCollection, renameCollection, updateEmoji, softDeleteCollection, maxCollections } = useCollections(user?.uid, { unlimited: !!userProfile?.unlimited })
   const { savedCollections, unsaveCollection } = useSavedCollections(user?.uid)
   const [showCreate, setShowCreate] = useState(false)
   const [editTarget, setEditTarget] = useState(null)
@@ -153,7 +153,7 @@ export default function Dashboard() {
                 onUpdateEmoji={updateEmoji}
               />
             ))}
-            {collections.length < MAX_COLLECTIONS && (
+            {collections.length < maxCollections && (
               <button
                 onClick={() => setShowCreate(true)}
                 className="w-full border border-dashed border-[var(--color-border)] hover:border-[var(--color-border-hover)] rounded-lg p-4 flex items-center gap-3 text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] transition-colors cursor-pointer"
@@ -196,7 +196,7 @@ export default function Dashboard() {
         open={showCreate}
         onClose={() => setShowCreate(false)}
         onCreate={createCollection}
-        maxReached={collections.length >= MAX_COLLECTIONS}
+        maxReached={collections.length >= maxCollections}
       />
 
       <Modal open={!!editTarget} onClose={() => setEditTarget(null)} title="Edit collection">
